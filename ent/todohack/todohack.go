@@ -8,8 +8,8 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/flume/enthistory"
 	"github.com/google/uuid"
+	"github.com/nixxxon/entdemo/ent/schema/optype"
 )
 
 const (
@@ -61,7 +61,7 @@ var (
 )
 
 // OperationValidator is a validator for the "operation" field enum values. It is called by the builders before save.
-func OperationValidator(o enthistory.OpType) error {
+func OperationValidator(o optype.OpType) error {
 	switch o.String() {
 	case "INSERT", "UPDATE", "DELETE":
 		return nil
@@ -104,8 +104,8 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 }
 
 var (
-	// enthistory.OpType must implement graphql.Marshaler.
-	_ graphql.Marshaler = (*enthistory.OpType)(nil)
-	// enthistory.OpType must implement graphql.Unmarshaler.
-	_ graphql.Unmarshaler = (*enthistory.OpType)(nil)
+	// optype.OpType must implement graphql.Marshaler.
+	_ graphql.Marshaler = (*optype.OpType)(nil)
+	// optype.OpType must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*optype.OpType)(nil)
 )

@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/flume/enthistory"
 	"github.com/google/uuid"
+	"github.com/nixxxon/entdemo/ent/schema/optype"
 	"github.com/nixxxon/entdemo/ent/todohack"
 )
 
@@ -51,8 +51,8 @@ func (thc *TodoHackCreate) SetNillableRef(u *uuid.UUID) *TodoHackCreate {
 }
 
 // SetOperation sets the "operation" field.
-func (thc *TodoHackCreate) SetOperation(et enthistory.OpType) *TodoHackCreate {
-	thc.mutation.SetOperation(et)
+func (thc *TodoHackCreate) SetOperation(ot optype.OpType) *TodoHackCreate {
+	thc.mutation.SetOperation(ot)
 	return thc
 }
 

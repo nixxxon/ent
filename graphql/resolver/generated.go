@@ -15,9 +15,9 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/flume/enthistory"
 	"github.com/google/uuid"
 	"github.com/nixxxon/entdemo/ent"
+	"github.com/nixxxon/entdemo/ent/schema/optype"
 	"github.com/nixxxon/entdemo/ent/schema/uuidgql"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -534,7 +534,7 @@ type TodoHack implements Node {
 """
 TodoHackOpType is enum for the field operation
 """
-enum TodoHackOpType @goModel(model: "github.com/flume/enthistory.OpType") {
+enum TodoHackOpType @goModel(model: "github.com/nixxxon/entdemo/ent/schema/optype.OpType") {
   INSERT
   UPDATE
   DELETE
@@ -1857,9 +1857,9 @@ func (ec *executionContext) _TodoHack_operation(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(enthistory.OpType)
+	res := resTmp.(optype.OpType)
 	fc.Result = res
-	return ec.marshalNTodoHackOpType2githubᚗcomᚋflumeᚋenthistoryᚐOpType(ctx, field.Selections, res)
+	return ec.marshalNTodoHackOpType2githubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_TodoHack_operation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4024,28 +4024,28 @@ func (ec *executionContext) unmarshalInputTodoHackWhereInput(ctx context.Context
 			it.RefNotNil = data
 		case "operation":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("operation"))
-			data, err := ec.unmarshalOTodoHackOpType2ᚖgithubᚗcomᚋflumeᚋenthistoryᚐOpType(ctx, v)
+			data, err := ec.unmarshalOTodoHackOpType2ᚖgithubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpType(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Operation = data
 		case "operationNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("operationNEQ"))
-			data, err := ec.unmarshalOTodoHackOpType2ᚖgithubᚗcomᚋflumeᚋenthistoryᚐOpType(ctx, v)
+			data, err := ec.unmarshalOTodoHackOpType2ᚖgithubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpType(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.OperationNEQ = data
 		case "operationIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("operationIn"))
-			data, err := ec.unmarshalOTodoHackOpType2ᚕgithubᚗcomᚋflumeᚋenthistoryᚐOpTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOTodoHackOpType2ᚕgithubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpTypeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.OperationIn = data
 		case "operationNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("operationNotIn"))
-			data, err := ec.unmarshalOTodoHackOpType2ᚕgithubᚗcomᚋflumeᚋenthistoryᚐOpTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOTodoHackOpType2ᚕgithubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpTypeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5442,20 +5442,14 @@ func (ec *executionContext) marshalNTodoConnection2ᚖgithubᚗcomᚋnixxxonᚋe
 	return ec._TodoConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNTodoHackOpType2githubᚗcomᚋflumeᚋenthistoryᚐOpType(ctx context.Context, v interface{}) (enthistory.OpType, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := enthistory.OpType(tmp)
+func (ec *executionContext) unmarshalNTodoHackOpType2githubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpType(ctx context.Context, v interface{}) (optype.OpType, error) {
+	var res optype.OpType
+	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNTodoHackOpType2githubᚗcomᚋflumeᚋenthistoryᚐOpType(ctx context.Context, sel ast.SelectionSet, v enthistory.OpType) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
+func (ec *executionContext) marshalNTodoHackOpType2githubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpType(ctx context.Context, sel ast.SelectionSet, v optype.OpType) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNTodoHackOrderField2ᚖgithubᚗcomᚋnixxxonᚋentdemoᚋentᚐTodoHackOrderField(ctx context.Context, v interface{}) (*ent.TodoHackOrderField, error) {
@@ -6045,7 +6039,7 @@ func (ec *executionContext) marshalOTodoEdge2ᚖgithubᚗcomᚋnixxxonᚋentdemo
 	return ec._TodoEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOTodoHackOpType2ᚕgithubᚗcomᚋflumeᚋenthistoryᚐOpTypeᚄ(ctx context.Context, v interface{}) ([]enthistory.OpType, error) {
+func (ec *executionContext) unmarshalOTodoHackOpType2ᚕgithubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpTypeᚄ(ctx context.Context, v interface{}) ([]optype.OpType, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -6054,10 +6048,10 @@ func (ec *executionContext) unmarshalOTodoHackOpType2ᚕgithubᚗcomᚋflumeᚋe
 		vSlice = graphql.CoerceList(v)
 	}
 	var err error
-	res := make([]enthistory.OpType, len(vSlice))
+	res := make([]optype.OpType, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNTodoHackOpType2githubᚗcomᚋflumeᚋenthistoryᚐOpType(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNTodoHackOpType2githubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpType(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -6065,7 +6059,7 @@ func (ec *executionContext) unmarshalOTodoHackOpType2ᚕgithubᚗcomᚋflumeᚋe
 	return res, nil
 }
 
-func (ec *executionContext) marshalOTodoHackOpType2ᚕgithubᚗcomᚋflumeᚋenthistoryᚐOpTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []enthistory.OpType) graphql.Marshaler {
+func (ec *executionContext) marshalOTodoHackOpType2ᚕgithubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []optype.OpType) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6092,7 +6086,7 @@ func (ec *executionContext) marshalOTodoHackOpType2ᚕgithubᚗcomᚋflumeᚋent
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNTodoHackOpType2githubᚗcomᚋflumeᚋenthistoryᚐOpType(ctx, sel, v[i])
+			ret[i] = ec.marshalNTodoHackOpType2githubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpType(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6112,21 +6106,20 @@ func (ec *executionContext) marshalOTodoHackOpType2ᚕgithubᚗcomᚋflumeᚋent
 	return ret
 }
 
-func (ec *executionContext) unmarshalOTodoHackOpType2ᚖgithubᚗcomᚋflumeᚋenthistoryᚐOpType(ctx context.Context, v interface{}) (*enthistory.OpType, error) {
+func (ec *executionContext) unmarshalOTodoHackOpType2ᚖgithubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpType(ctx context.Context, v interface{}) (*optype.OpType, error) {
 	if v == nil {
 		return nil, nil
 	}
-	tmp, err := graphql.UnmarshalString(v)
-	res := enthistory.OpType(tmp)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	var res = new(optype.OpType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOTodoHackOpType2ᚖgithubᚗcomᚋflumeᚋenthistoryᚐOpType(ctx context.Context, sel ast.SelectionSet, v *enthistory.OpType) graphql.Marshaler {
+func (ec *executionContext) marshalOTodoHackOpType2ᚖgithubᚗcomᚋnixxxonᚋentdemoᚋentᚋschemaᚋoptypeᚐOpType(ctx context.Context, sel ast.SelectionSet, v *optype.OpType) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	res := graphql.MarshalString(string(*v))
-	return res
+	return v
 }
 
 func (ec *executionContext) unmarshalOTodoHackWhereInput2ᚕᚖgithubᚗcomᚋnixxxonᚋentdemoᚋentᚐTodoHackWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.TodoHackWhereInput, error) {

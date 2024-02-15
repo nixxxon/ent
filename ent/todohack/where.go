@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/flume/enthistory"
 	"github.com/google/uuid"
 	"github.com/nixxxon/entdemo/ent/predicate"
+	"github.com/nixxxon/entdemo/ent/schema/optype"
 )
 
 // ID filters vertices based on their ID field.
@@ -167,22 +167,22 @@ func RefNotNil() predicate.TodoHack {
 }
 
 // OperationEQ applies the EQ predicate on the "operation" field.
-func OperationEQ(v enthistory.OpType) predicate.TodoHack {
+func OperationEQ(v optype.OpType) predicate.TodoHack {
 	return predicate.TodoHack(sql.FieldEQ(FieldOperation, v))
 }
 
 // OperationNEQ applies the NEQ predicate on the "operation" field.
-func OperationNEQ(v enthistory.OpType) predicate.TodoHack {
+func OperationNEQ(v optype.OpType) predicate.TodoHack {
 	return predicate.TodoHack(sql.FieldNEQ(FieldOperation, v))
 }
 
 // OperationIn applies the In predicate on the "operation" field.
-func OperationIn(vs ...enthistory.OpType) predicate.TodoHack {
+func OperationIn(vs ...optype.OpType) predicate.TodoHack {
 	return predicate.TodoHack(sql.FieldIn(FieldOperation, vs...))
 }
 
 // OperationNotIn applies the NotIn predicate on the "operation" field.
-func OperationNotIn(vs ...enthistory.OpType) predicate.TodoHack {
+func OperationNotIn(vs ...optype.OpType) predicate.TodoHack {
 	return predicate.TodoHack(sql.FieldNotIn(FieldOperation, vs...))
 }
 

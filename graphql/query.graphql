@@ -159,7 +159,7 @@ type TodoHack implements Node {
 """
 TodoHackOpType is enum for the field operation
 """
-enum TodoHackOpType @goModel(model: "github.com/flume/enthistory.OpType") {
+enum TodoHackOpType @goModel(model: "github.com/nixxxon/entdemo/ent/schema/optype.OpType") {
   INSERT
   UPDATE
   DELETE

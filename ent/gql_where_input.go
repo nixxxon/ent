@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flume/enthistory"
 	"github.com/google/uuid"
 	"github.com/nixxxon/entdemo/ent/predicate"
+	"github.com/nixxxon/entdemo/ent/schema/optype"
 	"github.com/nixxxon/entdemo/ent/todo"
 	"github.com/nixxxon/entdemo/ent/todohack"
 )
@@ -274,10 +274,10 @@ type TodoHackWhereInput struct {
 	RefNotNil bool        `json:"refNotNil,omitempty"`
 
 	// "operation" field predicates.
-	Operation      *enthistory.OpType  `json:"operation,omitempty"`
-	OperationNEQ   *enthistory.OpType  `json:"operationNEQ,omitempty"`
-	OperationIn    []enthistory.OpType `json:"operationIn,omitempty"`
-	OperationNotIn []enthistory.OpType `json:"operationNotIn,omitempty"`
+	Operation      *optype.OpType  `json:"operation,omitempty"`
+	OperationNEQ   *optype.OpType  `json:"operationNEQ,omitempty"`
+	OperationIn    []optype.OpType `json:"operationIn,omitempty"`
+	OperationNotIn []optype.OpType `json:"operationNotIn,omitempty"`
 
 	// "other_id" field predicates.
 	OtherID       *uuid.UUID  `json:"otherID,omitempty"`

@@ -11,9 +11,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/flume/enthistory"
 	"github.com/google/uuid"
 	"github.com/nixxxon/entdemo/ent/predicate"
+	"github.com/nixxxon/entdemo/ent/schema/optype"
 	"github.com/nixxxon/entdemo/ent/todo"
 	"github.com/nixxxon/entdemo/ent/todohack"
 )
@@ -447,7 +447,7 @@ type TodoHackMutation struct {
 	id            *uuid.UUID
 	history_time  *time.Time
 	ref           *uuid.UUID
-	operation     *enthistory.OpType
+	operation     *optype.OpType
 	other_id      *uuid.UUID
 	name          *string
 	clearedFields map[string]struct{}
@@ -646,12 +646,12 @@ func (m *TodoHackMutation) ResetRef() {
 }
 
 // SetOperation sets the "operation" field.
-func (m *TodoHackMutation) SetOperation(et enthistory.OpType) {
-	m.operation = &et
+func (m *TodoHackMutation) SetOperation(ot optype.OpType) {
+	m.operation = &ot
 }
 
 // Operation returns the value of the "operation" field in the mutation.
-func (m *TodoHackMutation) Operation() (r enthistory.OpType, exists bool) {
+func (m *TodoHackMutation) Operation() (r optype.OpType, exists bool) {
 	v := m.operation
 	if v == nil {
 		return
@@ -662,7 +662,7 @@ func (m *TodoHackMutation) Operation() (r enthistory.OpType, exists bool) {
 // OldOperation returns the old "operation" field's value of the TodoHack entity.
 // If the TodoHack object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TodoHackMutation) OldOperation(ctx context.Context) (v enthistory.OpType, err error) {
+func (m *TodoHackMutation) OldOperation(ctx context.Context) (v optype.OpType, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldOperation is only allowed on UpdateOne operations")
 	}
@@ -877,7 +877,7 @@ func (m *TodoHackMutation) SetField(name string, value ent.Value) error {
 		m.SetRef(v)
 		return nil
 	case todohack.FieldOperation:
-		v, ok := value.(enthistory.OpType)
+		v, ok := value.(optype.OpType)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

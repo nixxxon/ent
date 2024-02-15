@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/flume/enthistory"
 	"github.com/google/uuid"
+	"github.com/nixxxon/entdemo/ent/schema/optype"
 	"github.com/nixxxon/entdemo/ent/todohack"
 )
 
@@ -24,7 +24,7 @@ type TodoHack struct {
 	// Ref holds the value of the "ref" field.
 	Ref uuid.UUID `json:"ref,omitempty"`
 	// Operation holds the value of the "operation" field.
-	Operation enthistory.OpType `json:"operation,omitempty"`
+	Operation optype.OpType `json:"operation,omitempty"`
 	// OtherID holds the value of the "other_id" field.
 	OtherID uuid.UUID `json:"other_id,omitempty"`
 	// Name holds the value of the "name" field.
@@ -80,7 +80,7 @@ func (th *TodoHack) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field operation", values[i])
 			} else if value.Valid {
-				th.Operation = enthistory.OpType(value.String)
+				th.Operation = optype.OpType(value.String)
 			}
 		case todohack.FieldOtherID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
