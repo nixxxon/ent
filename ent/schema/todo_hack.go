@@ -4,7 +4,6 @@ package schema
 import (
 	"time"
 
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
@@ -40,12 +39,7 @@ func (TodoHack) Fields() []ent.Field {
 			Immutable(),
 		field.UUID("ref", uuid.UUID{}).
 			Immutable().
-			Optional().
-			Annotations(
-				entgql.Annotation{
-					Type: "ID",
-				},
-			),
+			Optional(),
 		field.Enum("operation").
 			GoType(enthistory.OpType("")).
 			Immutable(),
