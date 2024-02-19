@@ -10,60 +10,60 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/flume/enthistory"
 	"github.com/google/uuid"
-	"github.com/nixxxon/entdemo/ent/schema/optype"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 )
 
-// TodoHackCreate is the builder for creating a TodoHack entity.
-type TodoHackCreate struct {
+// TodoHistoryCreate is the builder for creating a TodoHistory entity.
+type TodoHistoryCreate struct {
 	config
-	mutation *TodoHackMutation
+	mutation *TodoHistoryMutation
 	hooks    []Hook
 }
 
 // SetHistoryTime sets the "history_time" field.
-func (thc *TodoHackCreate) SetHistoryTime(t time.Time) *TodoHackCreate {
+func (thc *TodoHistoryCreate) SetHistoryTime(t time.Time) *TodoHistoryCreate {
 	thc.mutation.SetHistoryTime(t)
 	return thc
 }
 
 // SetNillableHistoryTime sets the "history_time" field if the given value is not nil.
-func (thc *TodoHackCreate) SetNillableHistoryTime(t *time.Time) *TodoHackCreate {
+func (thc *TodoHistoryCreate) SetNillableHistoryTime(t *time.Time) *TodoHistoryCreate {
 	if t != nil {
 		thc.SetHistoryTime(*t)
 	}
 	return thc
 }
 
+// SetOperation sets the "operation" field.
+func (thc *TodoHistoryCreate) SetOperation(et enthistory.OpType) *TodoHistoryCreate {
+	thc.mutation.SetOperation(et)
+	return thc
+}
+
 // SetRef sets the "ref" field.
-func (thc *TodoHackCreate) SetRef(u uuid.UUID) *TodoHackCreate {
+func (thc *TodoHistoryCreate) SetRef(u uuid.UUID) *TodoHistoryCreate {
 	thc.mutation.SetRef(u)
 	return thc
 }
 
 // SetNillableRef sets the "ref" field if the given value is not nil.
-func (thc *TodoHackCreate) SetNillableRef(u *uuid.UUID) *TodoHackCreate {
+func (thc *TodoHistoryCreate) SetNillableRef(u *uuid.UUID) *TodoHistoryCreate {
 	if u != nil {
 		thc.SetRef(*u)
 	}
 	return thc
 }
 
-// SetOperation sets the "operation" field.
-func (thc *TodoHackCreate) SetOperation(ot optype.OpType) *TodoHackCreate {
-	thc.mutation.SetOperation(ot)
-	return thc
-}
-
 // SetOtherID sets the "other_id" field.
-func (thc *TodoHackCreate) SetOtherID(u uuid.UUID) *TodoHackCreate {
+func (thc *TodoHistoryCreate) SetOtherID(u uuid.UUID) *TodoHistoryCreate {
 	thc.mutation.SetOtherID(u)
 	return thc
 }
 
 // SetNillableOtherID sets the "other_id" field if the given value is not nil.
-func (thc *TodoHackCreate) SetNillableOtherID(u *uuid.UUID) *TodoHackCreate {
+func (thc *TodoHistoryCreate) SetNillableOtherID(u *uuid.UUID) *TodoHistoryCreate {
 	if u != nil {
 		thc.SetOtherID(*u)
 	}
@@ -71,38 +71,38 @@ func (thc *TodoHackCreate) SetNillableOtherID(u *uuid.UUID) *TodoHackCreate {
 }
 
 // SetName sets the "name" field.
-func (thc *TodoHackCreate) SetName(s string) *TodoHackCreate {
+func (thc *TodoHistoryCreate) SetName(s string) *TodoHistoryCreate {
 	thc.mutation.SetName(s)
 	return thc
 }
 
 // SetID sets the "id" field.
-func (thc *TodoHackCreate) SetID(u uuid.UUID) *TodoHackCreate {
+func (thc *TodoHistoryCreate) SetID(u uuid.UUID) *TodoHistoryCreate {
 	thc.mutation.SetID(u)
 	return thc
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (thc *TodoHackCreate) SetNillableID(u *uuid.UUID) *TodoHackCreate {
+func (thc *TodoHistoryCreate) SetNillableID(u *uuid.UUID) *TodoHistoryCreate {
 	if u != nil {
 		thc.SetID(*u)
 	}
 	return thc
 }
 
-// Mutation returns the TodoHackMutation object of the builder.
-func (thc *TodoHackCreate) Mutation() *TodoHackMutation {
+// Mutation returns the TodoHistoryMutation object of the builder.
+func (thc *TodoHistoryCreate) Mutation() *TodoHistoryMutation {
 	return thc.mutation
 }
 
-// Save creates the TodoHack in the database.
-func (thc *TodoHackCreate) Save(ctx context.Context) (*TodoHack, error) {
+// Save creates the TodoHistory in the database.
+func (thc *TodoHistoryCreate) Save(ctx context.Context) (*TodoHistory, error) {
 	thc.defaults()
 	return withHooks(ctx, thc.sqlSave, thc.mutation, thc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (thc *TodoHackCreate) SaveX(ctx context.Context) *TodoHack {
+func (thc *TodoHistoryCreate) SaveX(ctx context.Context) *TodoHistory {
 	v, err := thc.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -111,55 +111,55 @@ func (thc *TodoHackCreate) SaveX(ctx context.Context) *TodoHack {
 }
 
 // Exec executes the query.
-func (thc *TodoHackCreate) Exec(ctx context.Context) error {
+func (thc *TodoHistoryCreate) Exec(ctx context.Context) error {
 	_, err := thc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (thc *TodoHackCreate) ExecX(ctx context.Context) {
+func (thc *TodoHistoryCreate) ExecX(ctx context.Context) {
 	if err := thc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (thc *TodoHackCreate) defaults() {
+func (thc *TodoHistoryCreate) defaults() {
 	if _, ok := thc.mutation.HistoryTime(); !ok {
-		v := todohack.DefaultHistoryTime()
+		v := todohistory.DefaultHistoryTime()
 		thc.mutation.SetHistoryTime(v)
 	}
 	if _, ok := thc.mutation.ID(); !ok {
-		v := todohack.DefaultID()
+		v := todohistory.DefaultID()
 		thc.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (thc *TodoHackCreate) check() error {
+func (thc *TodoHistoryCreate) check() error {
 	if _, ok := thc.mutation.HistoryTime(); !ok {
-		return &ValidationError{Name: "history_time", err: errors.New(`ent: missing required field "TodoHack.history_time"`)}
+		return &ValidationError{Name: "history_time", err: errors.New(`ent: missing required field "TodoHistory.history_time"`)}
 	}
 	if _, ok := thc.mutation.Operation(); !ok {
-		return &ValidationError{Name: "operation", err: errors.New(`ent: missing required field "TodoHack.operation"`)}
+		return &ValidationError{Name: "operation", err: errors.New(`ent: missing required field "TodoHistory.operation"`)}
 	}
 	if v, ok := thc.mutation.Operation(); ok {
-		if err := todohack.OperationValidator(v); err != nil {
-			return &ValidationError{Name: "operation", err: fmt.Errorf(`ent: validator failed for field "TodoHack.operation": %w`, err)}
+		if err := todohistory.OperationValidator(v); err != nil {
+			return &ValidationError{Name: "operation", err: fmt.Errorf(`ent: validator failed for field "TodoHistory.operation": %w`, err)}
 		}
 	}
 	if _, ok := thc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "TodoHack.name"`)}
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "TodoHistory.name"`)}
 	}
 	if v, ok := thc.mutation.Name(); ok {
-		if err := todohack.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "TodoHack.name": %w`, err)}
+		if err := todohistory.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "TodoHistory.name": %w`, err)}
 		}
 	}
 	return nil
 }
 
-func (thc *TodoHackCreate) sqlSave(ctx context.Context) (*TodoHack, error) {
+func (thc *TodoHistoryCreate) sqlSave(ctx context.Context) (*TodoHistory, error) {
 	if err := thc.check(); err != nil {
 		return nil, err
 	}
@@ -182,59 +182,59 @@ func (thc *TodoHackCreate) sqlSave(ctx context.Context) (*TodoHack, error) {
 	return _node, nil
 }
 
-func (thc *TodoHackCreate) createSpec() (*TodoHack, *sqlgraph.CreateSpec) {
+func (thc *TodoHistoryCreate) createSpec() (*TodoHistory, *sqlgraph.CreateSpec) {
 	var (
-		_node = &TodoHack{config: thc.config}
-		_spec = sqlgraph.NewCreateSpec(todohack.Table, sqlgraph.NewFieldSpec(todohack.FieldID, field.TypeUUID))
+		_node = &TodoHistory{config: thc.config}
+		_spec = sqlgraph.NewCreateSpec(todohistory.Table, sqlgraph.NewFieldSpec(todohistory.FieldID, field.TypeUUID))
 	)
 	if id, ok := thc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
 	if value, ok := thc.mutation.HistoryTime(); ok {
-		_spec.SetField(todohack.FieldHistoryTime, field.TypeTime, value)
+		_spec.SetField(todohistory.FieldHistoryTime, field.TypeTime, value)
 		_node.HistoryTime = value
 	}
-	if value, ok := thc.mutation.Ref(); ok {
-		_spec.SetField(todohack.FieldRef, field.TypeUUID, value)
-		_node.Ref = value
-	}
 	if value, ok := thc.mutation.Operation(); ok {
-		_spec.SetField(todohack.FieldOperation, field.TypeEnum, value)
+		_spec.SetField(todohistory.FieldOperation, field.TypeEnum, value)
 		_node.Operation = value
 	}
+	if value, ok := thc.mutation.Ref(); ok {
+		_spec.SetField(todohistory.FieldRef, field.TypeUUID, value)
+		_node.Ref = value
+	}
 	if value, ok := thc.mutation.OtherID(); ok {
-		_spec.SetField(todohack.FieldOtherID, field.TypeUUID, value)
+		_spec.SetField(todohistory.FieldOtherID, field.TypeUUID, value)
 		_node.OtherID = value
 	}
 	if value, ok := thc.mutation.Name(); ok {
-		_spec.SetField(todohack.FieldName, field.TypeString, value)
+		_spec.SetField(todohistory.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
 	return _node, _spec
 }
 
-// TodoHackCreateBulk is the builder for creating many TodoHack entities in bulk.
-type TodoHackCreateBulk struct {
+// TodoHistoryCreateBulk is the builder for creating many TodoHistory entities in bulk.
+type TodoHistoryCreateBulk struct {
 	config
 	err      error
-	builders []*TodoHackCreate
+	builders []*TodoHistoryCreate
 }
 
-// Save creates the TodoHack entities in the database.
-func (thcb *TodoHackCreateBulk) Save(ctx context.Context) ([]*TodoHack, error) {
+// Save creates the TodoHistory entities in the database.
+func (thcb *TodoHistoryCreateBulk) Save(ctx context.Context) ([]*TodoHistory, error) {
 	if thcb.err != nil {
 		return nil, thcb.err
 	}
 	specs := make([]*sqlgraph.CreateSpec, len(thcb.builders))
-	nodes := make([]*TodoHack, len(thcb.builders))
+	nodes := make([]*TodoHistory, len(thcb.builders))
 	mutators := make([]Mutator, len(thcb.builders))
 	for i := range thcb.builders {
 		func(i int, root context.Context) {
 			builder := thcb.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*TodoHackMutation)
+				mutation, ok := m.(*TodoHistoryMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -277,7 +277,7 @@ func (thcb *TodoHackCreateBulk) Save(ctx context.Context) ([]*TodoHack, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (thcb *TodoHackCreateBulk) SaveX(ctx context.Context) []*TodoHack {
+func (thcb *TodoHistoryCreateBulk) SaveX(ctx context.Context) []*TodoHistory {
 	v, err := thcb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -286,13 +286,13 @@ func (thcb *TodoHackCreateBulk) SaveX(ctx context.Context) []*TodoHack {
 }
 
 // Exec executes the query.
-func (thcb *TodoHackCreateBulk) Exec(ctx context.Context) error {
+func (thcb *TodoHistoryCreateBulk) Exec(ctx context.Context) error {
 	_, err := thcb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (thcb *TodoHackCreateBulk) ExecX(ctx context.Context) {
+func (thcb *TodoHistoryCreateBulk) ExecX(ctx context.Context) {
 	if err := thcb.Exec(ctx); err != nil {
 		panic(err)
 	}

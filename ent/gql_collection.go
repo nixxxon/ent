@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/nixxxon/entdemo/ent/todo"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -107,7 +107,7 @@ func newTodoPaginateArgs(rv map[string]any) *todoPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (th *TodoHackQuery) CollectFields(ctx context.Context, satisfies ...string) (*TodoHackQuery, error) {
+func (th *TodoHistoryQuery) CollectFields(ctx context.Context, satisfies ...string) (*TodoHistoryQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
 		return th, nil
@@ -118,39 +118,39 @@ func (th *TodoHackQuery) CollectFields(ctx context.Context, satisfies ...string)
 	return th, nil
 }
 
-func (th *TodoHackQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (th *TodoHistoryQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
-		fieldSeen      = make(map[string]struct{}, len(todohack.Columns))
-		selectedFields = []string{todohack.FieldID}
+		fieldSeen      = make(map[string]struct{}, len(todohistory.Columns))
+		selectedFields = []string{todohistory.FieldID}
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
 		case "historyTime":
-			if _, ok := fieldSeen[todohack.FieldHistoryTime]; !ok {
-				selectedFields = append(selectedFields, todohack.FieldHistoryTime)
-				fieldSeen[todohack.FieldHistoryTime] = struct{}{}
-			}
-		case "ref":
-			if _, ok := fieldSeen[todohack.FieldRef]; !ok {
-				selectedFields = append(selectedFields, todohack.FieldRef)
-				fieldSeen[todohack.FieldRef] = struct{}{}
+			if _, ok := fieldSeen[todohistory.FieldHistoryTime]; !ok {
+				selectedFields = append(selectedFields, todohistory.FieldHistoryTime)
+				fieldSeen[todohistory.FieldHistoryTime] = struct{}{}
 			}
 		case "operation":
-			if _, ok := fieldSeen[todohack.FieldOperation]; !ok {
-				selectedFields = append(selectedFields, todohack.FieldOperation)
-				fieldSeen[todohack.FieldOperation] = struct{}{}
+			if _, ok := fieldSeen[todohistory.FieldOperation]; !ok {
+				selectedFields = append(selectedFields, todohistory.FieldOperation)
+				fieldSeen[todohistory.FieldOperation] = struct{}{}
+			}
+		case "ref":
+			if _, ok := fieldSeen[todohistory.FieldRef]; !ok {
+				selectedFields = append(selectedFields, todohistory.FieldRef)
+				fieldSeen[todohistory.FieldRef] = struct{}{}
 			}
 		case "otherID":
-			if _, ok := fieldSeen[todohack.FieldOtherID]; !ok {
-				selectedFields = append(selectedFields, todohack.FieldOtherID)
-				fieldSeen[todohack.FieldOtherID] = struct{}{}
+			if _, ok := fieldSeen[todohistory.FieldOtherID]; !ok {
+				selectedFields = append(selectedFields, todohistory.FieldOtherID)
+				fieldSeen[todohistory.FieldOtherID] = struct{}{}
 			}
 		case "name":
-			if _, ok := fieldSeen[todohack.FieldName]; !ok {
-				selectedFields = append(selectedFields, todohack.FieldName)
-				fieldSeen[todohack.FieldName] = struct{}{}
+			if _, ok := fieldSeen[todohistory.FieldName]; !ok {
+				selectedFields = append(selectedFields, todohistory.FieldName)
+				fieldSeen[todohistory.FieldName] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -164,14 +164,14 @@ func (th *TodoHackQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 	return nil
 }
 
-type todohackPaginateArgs struct {
+type todohistoryPaginateArgs struct {
 	first, last   *int
 	after, before *Cursor
-	opts          []TodoHackPaginateOption
+	opts          []TodoHistoryPaginateOption
 }
 
-func newTodoHackPaginateArgs(rv map[string]any) *todohackPaginateArgs {
-	args := &todohackPaginateArgs{}
+func newTodoHistoryPaginateArgs(rv map[string]any) *todohistoryPaginateArgs {
+	args := &todohistoryPaginateArgs{}
 	if rv == nil {
 		return args
 	}
@@ -192,7 +192,7 @@ func newTodoHackPaginateArgs(rv map[string]any) *todohackPaginateArgs {
 		case map[string]any:
 			var (
 				err1, err2 error
-				order      = &TodoHackOrder{Field: &TodoHackOrderField{}, Direction: entgql.OrderDirectionAsc}
+				order      = &TodoHistoryOrder{Field: &TodoHistoryOrderField{}, Direction: entgql.OrderDirectionAsc}
 			)
 			if d, ok := v[directionField]; ok {
 				err1 = order.Direction.UnmarshalGQL(d)
@@ -201,16 +201,16 @@ func newTodoHackPaginateArgs(rv map[string]any) *todohackPaginateArgs {
 				err2 = order.Field.UnmarshalGQL(f)
 			}
 			if err1 == nil && err2 == nil {
-				args.opts = append(args.opts, WithTodoHackOrder(order))
+				args.opts = append(args.opts, WithTodoHistoryOrder(order))
 			}
-		case *TodoHackOrder:
+		case *TodoHistoryOrder:
 			if v != nil {
-				args.opts = append(args.opts, WithTodoHackOrder(v))
+				args.opts = append(args.opts, WithTodoHistoryOrder(v))
 			}
 		}
 	}
-	if v, ok := rv[whereField].(*TodoHackWhereInput); ok {
-		args.opts = append(args.opts, WithTodoHackFilter(v.Filter))
+	if v, ok := rv[whereField].(*TodoHistoryWhereInput); ok {
+		args.opts = append(args.opts, WithTodoHistoryFilter(v.Filter))
 	}
 	return args
 }

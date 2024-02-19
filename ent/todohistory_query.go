@@ -12,69 +12,69 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/nixxxon/entdemo/ent/predicate"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 )
 
-// TodoHackQuery is the builder for querying TodoHack entities.
-type TodoHackQuery struct {
+// TodoHistoryQuery is the builder for querying TodoHistory entities.
+type TodoHistoryQuery struct {
 	config
 	ctx        *QueryContext
-	order      []todohack.OrderOption
+	order      []todohistory.OrderOption
 	inters     []Interceptor
-	predicates []predicate.TodoHack
+	predicates []predicate.TodoHistory
 	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*TodoHack) error
+	loadTotal  []func(context.Context, []*TodoHistory) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the TodoHackQuery builder.
-func (thq *TodoHackQuery) Where(ps ...predicate.TodoHack) *TodoHackQuery {
+// Where adds a new predicate for the TodoHistoryQuery builder.
+func (thq *TodoHistoryQuery) Where(ps ...predicate.TodoHistory) *TodoHistoryQuery {
 	thq.predicates = append(thq.predicates, ps...)
 	return thq
 }
 
 // Limit the number of records to be returned by this query.
-func (thq *TodoHackQuery) Limit(limit int) *TodoHackQuery {
+func (thq *TodoHistoryQuery) Limit(limit int) *TodoHistoryQuery {
 	thq.ctx.Limit = &limit
 	return thq
 }
 
 // Offset to start from.
-func (thq *TodoHackQuery) Offset(offset int) *TodoHackQuery {
+func (thq *TodoHistoryQuery) Offset(offset int) *TodoHistoryQuery {
 	thq.ctx.Offset = &offset
 	return thq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (thq *TodoHackQuery) Unique(unique bool) *TodoHackQuery {
+func (thq *TodoHistoryQuery) Unique(unique bool) *TodoHistoryQuery {
 	thq.ctx.Unique = &unique
 	return thq
 }
 
 // Order specifies how the records should be ordered.
-func (thq *TodoHackQuery) Order(o ...todohack.OrderOption) *TodoHackQuery {
+func (thq *TodoHistoryQuery) Order(o ...todohistory.OrderOption) *TodoHistoryQuery {
 	thq.order = append(thq.order, o...)
 	return thq
 }
 
-// First returns the first TodoHack entity from the query.
-// Returns a *NotFoundError when no TodoHack was found.
-func (thq *TodoHackQuery) First(ctx context.Context) (*TodoHack, error) {
+// First returns the first TodoHistory entity from the query.
+// Returns a *NotFoundError when no TodoHistory was found.
+func (thq *TodoHistoryQuery) First(ctx context.Context) (*TodoHistory, error) {
 	nodes, err := thq.Limit(1).All(setContextOp(ctx, thq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{todohack.Label}
+		return nil, &NotFoundError{todohistory.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (thq *TodoHackQuery) FirstX(ctx context.Context) *TodoHack {
+func (thq *TodoHistoryQuery) FirstX(ctx context.Context) *TodoHistory {
 	node, err := thq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -82,22 +82,22 @@ func (thq *TodoHackQuery) FirstX(ctx context.Context) *TodoHack {
 	return node
 }
 
-// FirstID returns the first TodoHack ID from the query.
-// Returns a *NotFoundError when no TodoHack ID was found.
-func (thq *TodoHackQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+// FirstID returns the first TodoHistory ID from the query.
+// Returns a *NotFoundError when no TodoHistory ID was found.
+func (thq *TodoHistoryQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
 	if ids, err = thq.Limit(1).IDs(setContextOp(ctx, thq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{todohack.Label}
+		err = &NotFoundError{todohistory.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (thq *TodoHackQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (thq *TodoHistoryQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := thq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -105,10 +105,10 @@ func (thq *TodoHackQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	return id
 }
 
-// Only returns a single TodoHack entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one TodoHack entity is found.
-// Returns a *NotFoundError when no TodoHack entities are found.
-func (thq *TodoHackQuery) Only(ctx context.Context) (*TodoHack, error) {
+// Only returns a single TodoHistory entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one TodoHistory entity is found.
+// Returns a *NotFoundError when no TodoHistory entities are found.
+func (thq *TodoHistoryQuery) Only(ctx context.Context) (*TodoHistory, error) {
 	nodes, err := thq.Limit(2).All(setContextOp(ctx, thq.ctx, "Only"))
 	if err != nil {
 		return nil, err
@@ -117,14 +117,14 @@ func (thq *TodoHackQuery) Only(ctx context.Context) (*TodoHack, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{todohack.Label}
+		return nil, &NotFoundError{todohistory.Label}
 	default:
-		return nil, &NotSingularError{todohack.Label}
+		return nil, &NotSingularError{todohistory.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (thq *TodoHackQuery) OnlyX(ctx context.Context) *TodoHack {
+func (thq *TodoHistoryQuery) OnlyX(ctx context.Context) *TodoHistory {
 	node, err := thq.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -132,10 +132,10 @@ func (thq *TodoHackQuery) OnlyX(ctx context.Context) *TodoHack {
 	return node
 }
 
-// OnlyID is like Only, but returns the only TodoHack ID in the query.
-// Returns a *NotSingularError when more than one TodoHack ID is found.
+// OnlyID is like Only, but returns the only TodoHistory ID in the query.
+// Returns a *NotSingularError when more than one TodoHistory ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (thq *TodoHackQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+func (thq *TodoHistoryQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 	var ids []uuid.UUID
 	if ids, err = thq.Limit(2).IDs(setContextOp(ctx, thq.ctx, "OnlyID")); err != nil {
 		return
@@ -144,15 +144,15 @@ func (thq *TodoHackQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) 
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{todohack.Label}
+		err = &NotFoundError{todohistory.Label}
 	default:
-		err = &NotSingularError{todohack.Label}
+		err = &NotSingularError{todohistory.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (thq *TodoHackQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (thq *TodoHistoryQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := thq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -160,18 +160,18 @@ func (thq *TodoHackQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	return id
 }
 
-// All executes the query and returns a list of TodoHacks.
-func (thq *TodoHackQuery) All(ctx context.Context) ([]*TodoHack, error) {
+// All executes the query and returns a list of TodoHistories.
+func (thq *TodoHistoryQuery) All(ctx context.Context) ([]*TodoHistory, error) {
 	ctx = setContextOp(ctx, thq.ctx, "All")
 	if err := thq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*TodoHack, *TodoHackQuery]()
-	return withInterceptors[[]*TodoHack](ctx, thq, qr, thq.inters)
+	qr := querierAll[[]*TodoHistory, *TodoHistoryQuery]()
+	return withInterceptors[[]*TodoHistory](ctx, thq, qr, thq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (thq *TodoHackQuery) AllX(ctx context.Context) []*TodoHack {
+func (thq *TodoHistoryQuery) AllX(ctx context.Context) []*TodoHistory {
 	nodes, err := thq.All(ctx)
 	if err != nil {
 		panic(err)
@@ -179,20 +179,20 @@ func (thq *TodoHackQuery) AllX(ctx context.Context) []*TodoHack {
 	return nodes
 }
 
-// IDs executes the query and returns a list of TodoHack IDs.
-func (thq *TodoHackQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
+// IDs executes the query and returns a list of TodoHistory IDs.
+func (thq *TodoHistoryQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if thq.ctx.Unique == nil && thq.path != nil {
 		thq.Unique(true)
 	}
 	ctx = setContextOp(ctx, thq.ctx, "IDs")
-	if err = thq.Select(todohack.FieldID).Scan(ctx, &ids); err != nil {
+	if err = thq.Select(todohistory.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (thq *TodoHackQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (thq *TodoHistoryQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := thq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -201,16 +201,16 @@ func (thq *TodoHackQuery) IDsX(ctx context.Context) []uuid.UUID {
 }
 
 // Count returns the count of the given query.
-func (thq *TodoHackQuery) Count(ctx context.Context) (int, error) {
+func (thq *TodoHistoryQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, thq.ctx, "Count")
 	if err := thq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, thq, querierCount[*TodoHackQuery](), thq.inters)
+	return withInterceptors[int](ctx, thq, querierCount[*TodoHistoryQuery](), thq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (thq *TodoHackQuery) CountX(ctx context.Context) int {
+func (thq *TodoHistoryQuery) CountX(ctx context.Context) int {
 	count, err := thq.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -219,7 +219,7 @@ func (thq *TodoHackQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (thq *TodoHackQuery) Exist(ctx context.Context) (bool, error) {
+func (thq *TodoHistoryQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, thq.ctx, "Exist")
 	switch _, err := thq.FirstID(ctx); {
 	case IsNotFound(err):
@@ -232,7 +232,7 @@ func (thq *TodoHackQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (thq *TodoHackQuery) ExistX(ctx context.Context) bool {
+func (thq *TodoHistoryQuery) ExistX(ctx context.Context) bool {
 	exist, err := thq.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -240,18 +240,18 @@ func (thq *TodoHackQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the TodoHackQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the TodoHistoryQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (thq *TodoHackQuery) Clone() *TodoHackQuery {
+func (thq *TodoHistoryQuery) Clone() *TodoHistoryQuery {
 	if thq == nil {
 		return nil
 	}
-	return &TodoHackQuery{
+	return &TodoHistoryQuery{
 		config:     thq.config,
 		ctx:        thq.ctx.Clone(),
-		order:      append([]todohack.OrderOption{}, thq.order...),
+		order:      append([]todohistory.OrderOption{}, thq.order...),
 		inters:     append([]Interceptor{}, thq.inters...),
-		predicates: append([]predicate.TodoHack{}, thq.predicates...),
+		predicates: append([]predicate.TodoHistory{}, thq.predicates...),
 		// clone intermediate query.
 		sql:  thq.sql.Clone(),
 		path: thq.path,
@@ -268,15 +268,15 @@ func (thq *TodoHackQuery) Clone() *TodoHackQuery {
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.TodoHack.Query().
-//		GroupBy(todohack.FieldHistoryTime).
+//	client.TodoHistory.Query().
+//		GroupBy(todohistory.FieldHistoryTime).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (thq *TodoHackQuery) GroupBy(field string, fields ...string) *TodoHackGroupBy {
+func (thq *TodoHistoryQuery) GroupBy(field string, fields ...string) *TodoHistoryGroupBy {
 	thq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &TodoHackGroupBy{build: thq}
+	grbuild := &TodoHistoryGroupBy{build: thq}
 	grbuild.flds = &thq.ctx.Fields
-	grbuild.label = todohack.Label
+	grbuild.label = todohistory.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -290,23 +290,23 @@ func (thq *TodoHackQuery) GroupBy(field string, fields ...string) *TodoHackGroup
 //		HistoryTime time.Time `json:"history_time,omitempty"`
 //	}
 //
-//	client.TodoHack.Query().
-//		Select(todohack.FieldHistoryTime).
+//	client.TodoHistory.Query().
+//		Select(todohistory.FieldHistoryTime).
 //		Scan(ctx, &v)
-func (thq *TodoHackQuery) Select(fields ...string) *TodoHackSelect {
+func (thq *TodoHistoryQuery) Select(fields ...string) *TodoHistorySelect {
 	thq.ctx.Fields = append(thq.ctx.Fields, fields...)
-	sbuild := &TodoHackSelect{TodoHackQuery: thq}
-	sbuild.label = todohack.Label
+	sbuild := &TodoHistorySelect{TodoHistoryQuery: thq}
+	sbuild.label = todohistory.Label
 	sbuild.flds, sbuild.scan = &thq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a TodoHackSelect configured with the given aggregations.
-func (thq *TodoHackQuery) Aggregate(fns ...AggregateFunc) *TodoHackSelect {
+// Aggregate returns a TodoHistorySelect configured with the given aggregations.
+func (thq *TodoHistoryQuery) Aggregate(fns ...AggregateFunc) *TodoHistorySelect {
 	return thq.Select().Aggregate(fns...)
 }
 
-func (thq *TodoHackQuery) prepareQuery(ctx context.Context) error {
+func (thq *TodoHistoryQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range thq.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -318,7 +318,7 @@ func (thq *TodoHackQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range thq.ctx.Fields {
-		if !todohack.ValidColumn(f) {
+		if !todohistory.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -332,16 +332,16 @@ func (thq *TodoHackQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (thq *TodoHackQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*TodoHack, error) {
+func (thq *TodoHistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*TodoHistory, error) {
 	var (
-		nodes = []*TodoHack{}
+		nodes = []*TodoHistory{}
 		_spec = thq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*TodoHack).scanValues(nil, columns)
+		return (*TodoHistory).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &TodoHack{config: thq.config}
+		node := &TodoHistory{config: thq.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
@@ -365,7 +365,7 @@ func (thq *TodoHackQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*To
 	return nodes, nil
 }
 
-func (thq *TodoHackQuery) sqlCount(ctx context.Context) (int, error) {
+func (thq *TodoHistoryQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := thq.querySpec()
 	if len(thq.modifiers) > 0 {
 		_spec.Modifiers = thq.modifiers
@@ -377,8 +377,8 @@ func (thq *TodoHackQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, thq.driver, _spec)
 }
 
-func (thq *TodoHackQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(todohack.Table, todohack.Columns, sqlgraph.NewFieldSpec(todohack.FieldID, field.TypeUUID))
+func (thq *TodoHistoryQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(todohistory.Table, todohistory.Columns, sqlgraph.NewFieldSpec(todohistory.FieldID, field.TypeUUID))
 	_spec.From = thq.sql
 	if unique := thq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -387,9 +387,9 @@ func (thq *TodoHackQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := thq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, todohack.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, todohistory.FieldID)
 		for i := range fields {
-			if fields[i] != todohack.FieldID {
+			if fields[i] != todohistory.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -417,12 +417,12 @@ func (thq *TodoHackQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (thq *TodoHackQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (thq *TodoHistoryQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(thq.driver.Dialect())
-	t1 := builder.Table(todohack.Table)
+	t1 := builder.Table(todohistory.Table)
 	columns := thq.ctx.Fields
 	if len(columns) == 0 {
-		columns = todohack.Columns
+		columns = todohistory.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if thq.sql != nil {
@@ -449,28 +449,28 @@ func (thq *TodoHackQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// TodoHackGroupBy is the group-by builder for TodoHack entities.
-type TodoHackGroupBy struct {
+// TodoHistoryGroupBy is the group-by builder for TodoHistory entities.
+type TodoHistoryGroupBy struct {
 	selector
-	build *TodoHackQuery
+	build *TodoHistoryQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (thgb *TodoHackGroupBy) Aggregate(fns ...AggregateFunc) *TodoHackGroupBy {
+func (thgb *TodoHistoryGroupBy) Aggregate(fns ...AggregateFunc) *TodoHistoryGroupBy {
 	thgb.fns = append(thgb.fns, fns...)
 	return thgb
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (thgb *TodoHackGroupBy) Scan(ctx context.Context, v any) error {
+func (thgb *TodoHistoryGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, thgb.build.ctx, "GroupBy")
 	if err := thgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*TodoHackQuery, *TodoHackGroupBy](ctx, thgb.build, thgb, thgb.build.inters, v)
+	return scanWithInterceptors[*TodoHistoryQuery, *TodoHistoryGroupBy](ctx, thgb.build, thgb, thgb.build.inters, v)
 }
 
-func (thgb *TodoHackGroupBy) sqlScan(ctx context.Context, root *TodoHackQuery, v any) error {
+func (thgb *TodoHistoryGroupBy) sqlScan(ctx context.Context, root *TodoHistoryQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(thgb.fns))
 	for _, fn := range thgb.fns {
@@ -497,28 +497,28 @@ func (thgb *TodoHackGroupBy) sqlScan(ctx context.Context, root *TodoHackQuery, v
 	return sql.ScanSlice(rows, v)
 }
 
-// TodoHackSelect is the builder for selecting fields of TodoHack entities.
-type TodoHackSelect struct {
-	*TodoHackQuery
+// TodoHistorySelect is the builder for selecting fields of TodoHistory entities.
+type TodoHistorySelect struct {
+	*TodoHistoryQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (ths *TodoHackSelect) Aggregate(fns ...AggregateFunc) *TodoHackSelect {
+func (ths *TodoHistorySelect) Aggregate(fns ...AggregateFunc) *TodoHistorySelect {
 	ths.fns = append(ths.fns, fns...)
 	return ths
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (ths *TodoHackSelect) Scan(ctx context.Context, v any) error {
+func (ths *TodoHistorySelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, ths.ctx, "Select")
 	if err := ths.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*TodoHackQuery, *TodoHackSelect](ctx, ths.TodoHackQuery, ths, ths.inters, v)
+	return scanWithInterceptors[*TodoHistoryQuery, *TodoHistorySelect](ctx, ths.TodoHistoryQuery, ths, ths.inters, v)
 }
 
-func (ths *TodoHackSelect) sqlScan(ctx context.Context, root *TodoHackQuery, v any) error {
+func (ths *TodoHistorySelect) sqlScan(ctx context.Context, root *TodoHistoryQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(ths.fns))
 	for _, fn := range ths.fns {

@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/nixxxon/entdemo/ent/todo"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -74,8 +74,8 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			todo.Table:     todo.ValidColumn,
-			todohack.Table: todohack.ValidColumn,
+			todo.Table:        todo.ValidColumn,
+			todohistory.Table: todohistory.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

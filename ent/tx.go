@@ -14,8 +14,8 @@ type Tx struct {
 	config
 	// Todo is the client for interacting with the Todo builders.
 	Todo *TodoClient
-	// TodoHack is the client for interacting with the TodoHack builders.
-	TodoHack *TodoHackClient
+	// TodoHistory is the client for interacting with the TodoHistory builders.
+	TodoHistory *TodoHistoryClient
 
 	// lazily loaded.
 	client     *Client
@@ -148,7 +148,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Todo = NewTodoClient(tx.config)
-	tx.TodoHack = NewTodoHackClient(tx.config)
+	tx.TodoHistory = NewTodoHistoryClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

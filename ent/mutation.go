@@ -11,11 +11,11 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/flume/enthistory"
 	"github.com/google/uuid"
 	"github.com/nixxxon/entdemo/ent/predicate"
-	"github.com/nixxxon/entdemo/ent/schema/optype"
 	"github.com/nixxxon/entdemo/ent/todo"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 )
 
 const (
@@ -27,8 +27,8 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeTodo     = "Todo"
-	TypeTodoHack = "TodoHack"
+	TypeTodo        = "Todo"
+	TypeTodoHistory = "TodoHistory"
 )
 
 // TodoMutation represents an operation that mutates the Todo nodes in the graph.
@@ -439,34 +439,34 @@ func (m *TodoMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Todo edge %s", name)
 }
 
-// TodoHackMutation represents an operation that mutates the TodoHack nodes in the graph.
-type TodoHackMutation struct {
+// TodoHistoryMutation represents an operation that mutates the TodoHistory nodes in the graph.
+type TodoHistoryMutation struct {
 	config
 	op            Op
 	typ           string
 	id            *uuid.UUID
 	history_time  *time.Time
+	operation     *enthistory.OpType
 	ref           *uuid.UUID
-	operation     *optype.OpType
 	other_id      *uuid.UUID
 	name          *string
 	clearedFields map[string]struct{}
 	done          bool
-	oldValue      func(context.Context) (*TodoHack, error)
-	predicates    []predicate.TodoHack
+	oldValue      func(context.Context) (*TodoHistory, error)
+	predicates    []predicate.TodoHistory
 }
 
-var _ ent.Mutation = (*TodoHackMutation)(nil)
+var _ ent.Mutation = (*TodoHistoryMutation)(nil)
 
-// todohackOption allows management of the mutation configuration using functional options.
-type todohackOption func(*TodoHackMutation)
+// todohistoryOption allows management of the mutation configuration using functional options.
+type todohistoryOption func(*TodoHistoryMutation)
 
-// newTodoHackMutation creates new mutation for the TodoHack entity.
-func newTodoHackMutation(c config, op Op, opts ...todohackOption) *TodoHackMutation {
-	m := &TodoHackMutation{
+// newTodoHistoryMutation creates new mutation for the TodoHistory entity.
+func newTodoHistoryMutation(c config, op Op, opts ...todohistoryOption) *TodoHistoryMutation {
+	m := &TodoHistoryMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeTodoHack,
+		typ:           TypeTodoHistory,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -475,20 +475,20 @@ func newTodoHackMutation(c config, op Op, opts ...todohackOption) *TodoHackMutat
 	return m
 }
 
-// withTodoHackID sets the ID field of the mutation.
-func withTodoHackID(id uuid.UUID) todohackOption {
-	return func(m *TodoHackMutation) {
+// withTodoHistoryID sets the ID field of the mutation.
+func withTodoHistoryID(id uuid.UUID) todohistoryOption {
+	return func(m *TodoHistoryMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *TodoHack
+			value *TodoHistory
 		)
-		m.oldValue = func(ctx context.Context) (*TodoHack, error) {
+		m.oldValue = func(ctx context.Context) (*TodoHistory, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().TodoHack.Get(ctx, id)
+					value, err = m.Client().TodoHistory.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -497,10 +497,10 @@ func withTodoHackID(id uuid.UUID) todohackOption {
 	}
 }
 
-// withTodoHack sets the old TodoHack of the mutation.
-func withTodoHack(node *TodoHack) todohackOption {
-	return func(m *TodoHackMutation) {
-		m.oldValue = func(context.Context) (*TodoHack, error) {
+// withTodoHistory sets the old TodoHistory of the mutation.
+func withTodoHistory(node *TodoHistory) todohistoryOption {
+	return func(m *TodoHistoryMutation) {
+		m.oldValue = func(context.Context) (*TodoHistory, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -509,7 +509,7 @@ func withTodoHack(node *TodoHack) todohackOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m TodoHackMutation) Client() *Client {
+func (m TodoHistoryMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -517,7 +517,7 @@ func (m TodoHackMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m TodoHackMutation) Tx() (*Tx, error) {
+func (m TodoHistoryMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -527,14 +527,14 @@ func (m TodoHackMutation) Tx() (*Tx, error) {
 }
 
 // SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of TodoHack entities.
-func (m *TodoHackMutation) SetID(id uuid.UUID) {
+// operation is only accepted on creation of TodoHistory entities.
+func (m *TodoHistoryMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *TodoHackMutation) ID() (id uuid.UUID, exists bool) {
+func (m *TodoHistoryMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -545,7 +545,7 @@ func (m *TodoHackMutation) ID() (id uuid.UUID, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *TodoHackMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+func (m *TodoHistoryMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -554,19 +554,19 @@ func (m *TodoHackMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().TodoHack.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().TodoHistory.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
 // SetHistoryTime sets the "history_time" field.
-func (m *TodoHackMutation) SetHistoryTime(t time.Time) {
+func (m *TodoHistoryMutation) SetHistoryTime(t time.Time) {
 	m.history_time = &t
 }
 
 // HistoryTime returns the value of the "history_time" field in the mutation.
-func (m *TodoHackMutation) HistoryTime() (r time.Time, exists bool) {
+func (m *TodoHistoryMutation) HistoryTime() (r time.Time, exists bool) {
 	v := m.history_time
 	if v == nil {
 		return
@@ -574,10 +574,10 @@ func (m *TodoHackMutation) HistoryTime() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldHistoryTime returns the old "history_time" field's value of the TodoHack entity.
-// If the TodoHack object wasn't provided to the builder, the object is fetched from the database.
+// OldHistoryTime returns the old "history_time" field's value of the TodoHistory entity.
+// If the TodoHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TodoHackMutation) OldHistoryTime(ctx context.Context) (v time.Time, err error) {
+func (m *TodoHistoryMutation) OldHistoryTime(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldHistoryTime is only allowed on UpdateOne operations")
 	}
@@ -592,66 +592,17 @@ func (m *TodoHackMutation) OldHistoryTime(ctx context.Context) (v time.Time, err
 }
 
 // ResetHistoryTime resets all changes to the "history_time" field.
-func (m *TodoHackMutation) ResetHistoryTime() {
+func (m *TodoHistoryMutation) ResetHistoryTime() {
 	m.history_time = nil
 }
 
-// SetRef sets the "ref" field.
-func (m *TodoHackMutation) SetRef(u uuid.UUID) {
-	m.ref = &u
-}
-
-// Ref returns the value of the "ref" field in the mutation.
-func (m *TodoHackMutation) Ref() (r uuid.UUID, exists bool) {
-	v := m.ref
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRef returns the old "ref" field's value of the TodoHack entity.
-// If the TodoHack object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TodoHackMutation) OldRef(ctx context.Context) (v uuid.UUID, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRef is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRef requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRef: %w", err)
-	}
-	return oldValue.Ref, nil
-}
-
-// ClearRef clears the value of the "ref" field.
-func (m *TodoHackMutation) ClearRef() {
-	m.ref = nil
-	m.clearedFields[todohack.FieldRef] = struct{}{}
-}
-
-// RefCleared returns if the "ref" field was cleared in this mutation.
-func (m *TodoHackMutation) RefCleared() bool {
-	_, ok := m.clearedFields[todohack.FieldRef]
-	return ok
-}
-
-// ResetRef resets all changes to the "ref" field.
-func (m *TodoHackMutation) ResetRef() {
-	m.ref = nil
-	delete(m.clearedFields, todohack.FieldRef)
-}
-
 // SetOperation sets the "operation" field.
-func (m *TodoHackMutation) SetOperation(ot optype.OpType) {
-	m.operation = &ot
+func (m *TodoHistoryMutation) SetOperation(et enthistory.OpType) {
+	m.operation = &et
 }
 
 // Operation returns the value of the "operation" field in the mutation.
-func (m *TodoHackMutation) Operation() (r optype.OpType, exists bool) {
+func (m *TodoHistoryMutation) Operation() (r enthistory.OpType, exists bool) {
 	v := m.operation
 	if v == nil {
 		return
@@ -659,10 +610,10 @@ func (m *TodoHackMutation) Operation() (r optype.OpType, exists bool) {
 	return *v, true
 }
 
-// OldOperation returns the old "operation" field's value of the TodoHack entity.
-// If the TodoHack object wasn't provided to the builder, the object is fetched from the database.
+// OldOperation returns the old "operation" field's value of the TodoHistory entity.
+// If the TodoHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TodoHackMutation) OldOperation(ctx context.Context) (v optype.OpType, err error) {
+func (m *TodoHistoryMutation) OldOperation(ctx context.Context) (v enthistory.OpType, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldOperation is only allowed on UpdateOne operations")
 	}
@@ -677,17 +628,66 @@ func (m *TodoHackMutation) OldOperation(ctx context.Context) (v optype.OpType, e
 }
 
 // ResetOperation resets all changes to the "operation" field.
-func (m *TodoHackMutation) ResetOperation() {
+func (m *TodoHistoryMutation) ResetOperation() {
 	m.operation = nil
 }
 
+// SetRef sets the "ref" field.
+func (m *TodoHistoryMutation) SetRef(u uuid.UUID) {
+	m.ref = &u
+}
+
+// Ref returns the value of the "ref" field in the mutation.
+func (m *TodoHistoryMutation) Ref() (r uuid.UUID, exists bool) {
+	v := m.ref
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRef returns the old "ref" field's value of the TodoHistory entity.
+// If the TodoHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TodoHistoryMutation) OldRef(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRef is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRef requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRef: %w", err)
+	}
+	return oldValue.Ref, nil
+}
+
+// ClearRef clears the value of the "ref" field.
+func (m *TodoHistoryMutation) ClearRef() {
+	m.ref = nil
+	m.clearedFields[todohistory.FieldRef] = struct{}{}
+}
+
+// RefCleared returns if the "ref" field was cleared in this mutation.
+func (m *TodoHistoryMutation) RefCleared() bool {
+	_, ok := m.clearedFields[todohistory.FieldRef]
+	return ok
+}
+
+// ResetRef resets all changes to the "ref" field.
+func (m *TodoHistoryMutation) ResetRef() {
+	m.ref = nil
+	delete(m.clearedFields, todohistory.FieldRef)
+}
+
 // SetOtherID sets the "other_id" field.
-func (m *TodoHackMutation) SetOtherID(u uuid.UUID) {
+func (m *TodoHistoryMutation) SetOtherID(u uuid.UUID) {
 	m.other_id = &u
 }
 
 // OtherID returns the value of the "other_id" field in the mutation.
-func (m *TodoHackMutation) OtherID() (r uuid.UUID, exists bool) {
+func (m *TodoHistoryMutation) OtherID() (r uuid.UUID, exists bool) {
 	v := m.other_id
 	if v == nil {
 		return
@@ -695,10 +695,10 @@ func (m *TodoHackMutation) OtherID() (r uuid.UUID, exists bool) {
 	return *v, true
 }
 
-// OldOtherID returns the old "other_id" field's value of the TodoHack entity.
-// If the TodoHack object wasn't provided to the builder, the object is fetched from the database.
+// OldOtherID returns the old "other_id" field's value of the TodoHistory entity.
+// If the TodoHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TodoHackMutation) OldOtherID(ctx context.Context) (v uuid.UUID, err error) {
+func (m *TodoHistoryMutation) OldOtherID(ctx context.Context) (v uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldOtherID is only allowed on UpdateOne operations")
 	}
@@ -713,30 +713,30 @@ func (m *TodoHackMutation) OldOtherID(ctx context.Context) (v uuid.UUID, err err
 }
 
 // ClearOtherID clears the value of the "other_id" field.
-func (m *TodoHackMutation) ClearOtherID() {
+func (m *TodoHistoryMutation) ClearOtherID() {
 	m.other_id = nil
-	m.clearedFields[todohack.FieldOtherID] = struct{}{}
+	m.clearedFields[todohistory.FieldOtherID] = struct{}{}
 }
 
 // OtherIDCleared returns if the "other_id" field was cleared in this mutation.
-func (m *TodoHackMutation) OtherIDCleared() bool {
-	_, ok := m.clearedFields[todohack.FieldOtherID]
+func (m *TodoHistoryMutation) OtherIDCleared() bool {
+	_, ok := m.clearedFields[todohistory.FieldOtherID]
 	return ok
 }
 
 // ResetOtherID resets all changes to the "other_id" field.
-func (m *TodoHackMutation) ResetOtherID() {
+func (m *TodoHistoryMutation) ResetOtherID() {
 	m.other_id = nil
-	delete(m.clearedFields, todohack.FieldOtherID)
+	delete(m.clearedFields, todohistory.FieldOtherID)
 }
 
 // SetName sets the "name" field.
-func (m *TodoHackMutation) SetName(s string) {
+func (m *TodoHistoryMutation) SetName(s string) {
 	m.name = &s
 }
 
 // Name returns the value of the "name" field in the mutation.
-func (m *TodoHackMutation) Name() (r string, exists bool) {
+func (m *TodoHistoryMutation) Name() (r string, exists bool) {
 	v := m.name
 	if v == nil {
 		return
@@ -744,10 +744,10 @@ func (m *TodoHackMutation) Name() (r string, exists bool) {
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the TodoHack entity.
-// If the TodoHack object wasn't provided to the builder, the object is fetched from the database.
+// OldName returns the old "name" field's value of the TodoHistory entity.
+// If the TodoHistory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TodoHackMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *TodoHistoryMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
@@ -762,19 +762,19 @@ func (m *TodoHackMutation) OldName(ctx context.Context) (v string, err error) {
 }
 
 // ResetName resets all changes to the "name" field.
-func (m *TodoHackMutation) ResetName() {
+func (m *TodoHistoryMutation) ResetName() {
 	m.name = nil
 }
 
-// Where appends a list predicates to the TodoHackMutation builder.
-func (m *TodoHackMutation) Where(ps ...predicate.TodoHack) {
+// Where appends a list predicates to the TodoHistoryMutation builder.
+func (m *TodoHistoryMutation) Where(ps ...predicate.TodoHistory) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the TodoHackMutation builder. Using this method,
+// WhereP appends storage-level predicates to the TodoHistoryMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *TodoHackMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.TodoHack, len(ps))
+func (m *TodoHistoryMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.TodoHistory, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -782,39 +782,39 @@ func (m *TodoHackMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *TodoHackMutation) Op() Op {
+func (m *TodoHistoryMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *TodoHackMutation) SetOp(op Op) {
+func (m *TodoHistoryMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (TodoHack).
-func (m *TodoHackMutation) Type() string {
+// Type returns the node type of this mutation (TodoHistory).
+func (m *TodoHistoryMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *TodoHackMutation) Fields() []string {
+func (m *TodoHistoryMutation) Fields() []string {
 	fields := make([]string, 0, 5)
 	if m.history_time != nil {
-		fields = append(fields, todohack.FieldHistoryTime)
-	}
-	if m.ref != nil {
-		fields = append(fields, todohack.FieldRef)
+		fields = append(fields, todohistory.FieldHistoryTime)
 	}
 	if m.operation != nil {
-		fields = append(fields, todohack.FieldOperation)
+		fields = append(fields, todohistory.FieldOperation)
+	}
+	if m.ref != nil {
+		fields = append(fields, todohistory.FieldRef)
 	}
 	if m.other_id != nil {
-		fields = append(fields, todohack.FieldOtherID)
+		fields = append(fields, todohistory.FieldOtherID)
 	}
 	if m.name != nil {
-		fields = append(fields, todohack.FieldName)
+		fields = append(fields, todohistory.FieldName)
 	}
 	return fields
 }
@@ -822,17 +822,17 @@ func (m *TodoHackMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *TodoHackMutation) Field(name string) (ent.Value, bool) {
+func (m *TodoHistoryMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case todohack.FieldHistoryTime:
+	case todohistory.FieldHistoryTime:
 		return m.HistoryTime()
-	case todohack.FieldRef:
-		return m.Ref()
-	case todohack.FieldOperation:
+	case todohistory.FieldOperation:
 		return m.Operation()
-	case todohack.FieldOtherID:
+	case todohistory.FieldRef:
+		return m.Ref()
+	case todohistory.FieldOtherID:
 		return m.OtherID()
-	case todohack.FieldName:
+	case todohistory.FieldName:
 		return m.Name()
 	}
 	return nil, false
@@ -841,56 +841,56 @@ func (m *TodoHackMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *TodoHackMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *TodoHistoryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case todohack.FieldHistoryTime:
+	case todohistory.FieldHistoryTime:
 		return m.OldHistoryTime(ctx)
-	case todohack.FieldRef:
-		return m.OldRef(ctx)
-	case todohack.FieldOperation:
+	case todohistory.FieldOperation:
 		return m.OldOperation(ctx)
-	case todohack.FieldOtherID:
+	case todohistory.FieldRef:
+		return m.OldRef(ctx)
+	case todohistory.FieldOtherID:
 		return m.OldOtherID(ctx)
-	case todohack.FieldName:
+	case todohistory.FieldName:
 		return m.OldName(ctx)
 	}
-	return nil, fmt.Errorf("unknown TodoHack field %s", name)
+	return nil, fmt.Errorf("unknown TodoHistory field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *TodoHackMutation) SetField(name string, value ent.Value) error {
+func (m *TodoHistoryMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case todohack.FieldHistoryTime:
+	case todohistory.FieldHistoryTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetHistoryTime(v)
 		return nil
-	case todohack.FieldRef:
+	case todohistory.FieldOperation:
+		v, ok := value.(enthistory.OpType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOperation(v)
+		return nil
+	case todohistory.FieldRef:
 		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRef(v)
 		return nil
-	case todohack.FieldOperation:
-		v, ok := value.(optype.OpType)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetOperation(v)
-		return nil
-	case todohack.FieldOtherID:
+	case todohistory.FieldOtherID:
 		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOtherID(v)
 		return nil
-	case todohack.FieldName:
+	case todohistory.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -898,132 +898,132 @@ func (m *TodoHackMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	}
-	return fmt.Errorf("unknown TodoHack field %s", name)
+	return fmt.Errorf("unknown TodoHistory field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *TodoHackMutation) AddedFields() []string {
+func (m *TodoHistoryMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *TodoHackMutation) AddedField(name string) (ent.Value, bool) {
+func (m *TodoHistoryMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *TodoHackMutation) AddField(name string, value ent.Value) error {
+func (m *TodoHistoryMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown TodoHack numeric field %s", name)
+	return fmt.Errorf("unknown TodoHistory numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *TodoHackMutation) ClearedFields() []string {
+func (m *TodoHistoryMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(todohack.FieldRef) {
-		fields = append(fields, todohack.FieldRef)
+	if m.FieldCleared(todohistory.FieldRef) {
+		fields = append(fields, todohistory.FieldRef)
 	}
-	if m.FieldCleared(todohack.FieldOtherID) {
-		fields = append(fields, todohack.FieldOtherID)
+	if m.FieldCleared(todohistory.FieldOtherID) {
+		fields = append(fields, todohistory.FieldOtherID)
 	}
 	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *TodoHackMutation) FieldCleared(name string) bool {
+func (m *TodoHistoryMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *TodoHackMutation) ClearField(name string) error {
+func (m *TodoHistoryMutation) ClearField(name string) error {
 	switch name {
-	case todohack.FieldRef:
+	case todohistory.FieldRef:
 		m.ClearRef()
 		return nil
-	case todohack.FieldOtherID:
+	case todohistory.FieldOtherID:
 		m.ClearOtherID()
 		return nil
 	}
-	return fmt.Errorf("unknown TodoHack nullable field %s", name)
+	return fmt.Errorf("unknown TodoHistory nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *TodoHackMutation) ResetField(name string) error {
+func (m *TodoHistoryMutation) ResetField(name string) error {
 	switch name {
-	case todohack.FieldHistoryTime:
+	case todohistory.FieldHistoryTime:
 		m.ResetHistoryTime()
 		return nil
-	case todohack.FieldRef:
-		m.ResetRef()
-		return nil
-	case todohack.FieldOperation:
+	case todohistory.FieldOperation:
 		m.ResetOperation()
 		return nil
-	case todohack.FieldOtherID:
+	case todohistory.FieldRef:
+		m.ResetRef()
+		return nil
+	case todohistory.FieldOtherID:
 		m.ResetOtherID()
 		return nil
-	case todohack.FieldName:
+	case todohistory.FieldName:
 		m.ResetName()
 		return nil
 	}
-	return fmt.Errorf("unknown TodoHack field %s", name)
+	return fmt.Errorf("unknown TodoHistory field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *TodoHackMutation) AddedEdges() []string {
+func (m *TodoHistoryMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *TodoHackMutation) AddedIDs(name string) []ent.Value {
+func (m *TodoHistoryMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *TodoHackMutation) RemovedEdges() []string {
+func (m *TodoHistoryMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *TodoHackMutation) RemovedIDs(name string) []ent.Value {
+func (m *TodoHistoryMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *TodoHackMutation) ClearedEdges() []string {
+func (m *TodoHistoryMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *TodoHackMutation) EdgeCleared(name string) bool {
+func (m *TodoHistoryMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *TodoHackMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown TodoHack unique edge %s", name)
+func (m *TodoHistoryMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown TodoHistory unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *TodoHackMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown TodoHack edge %s", name)
+func (m *TodoHistoryMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown TodoHistory edge %s", name)
 }

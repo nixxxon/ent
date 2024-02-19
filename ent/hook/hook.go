@@ -21,16 +21,16 @@ func (f TodoFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TodoMutation", m)
 }
 
-// The TodoHackFunc type is an adapter to allow the use of ordinary
-// function as TodoHack mutator.
-type TodoHackFunc func(context.Context, *ent.TodoHackMutation) (ent.Value, error)
+// The TodoHistoryFunc type is an adapter to allow the use of ordinary
+// function as TodoHistory mutator.
+type TodoHistoryFunc func(context.Context, *ent.TodoHistoryMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f TodoHackFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TodoHackMutation); ok {
+func (f TodoHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TodoHistoryMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TodoHackMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TodoHistoryMutation", m)
 }
 
 // Condition is a hook condition function.

@@ -5,8 +5,10 @@
 package ent
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent"
 
@@ -36,4 +38,128 @@ func rollback(tx *Tx, err error) error {
 		return err
 	}
 	return err
+}
+
+func (m *TodoMutation) CreateHistoryFromCreate(ctx context.Context) error {
+	client := m.Client()
+	tx, err := m.Tx()
+	if err != nil {
+		tx = nil
+	}
+
+	id, ok := m.ID()
+	if !ok {
+		return rollback(tx, idNotFoundError)
+	}
+
+	create := client.TodoHistory.Create()
+	if tx != nil {
+		create = tx.TodoHistory.Create()
+	}
+
+	create = create.
+		SetOperation(EntOpToHistoryOp(m.Op())).
+		SetHistoryTime(time.Now()).
+		SetRef(id)
+
+	if otherID, exists := m.OtherID(); exists {
+		create = create.SetOtherID(otherID)
+	}
+
+	if name, exists := m.Name(); exists {
+		create = create.SetName(name)
+	}
+
+	_, err = create.Save(ctx)
+	if err != nil {
+		rollback(tx, err)
+	}
+	return nil
+}
+
+func (m *TodoMutation) CreateHistoryFromUpdate(ctx context.Context) error {
+	client := m.Client()
+	tx, err := m.Tx()
+	if err != nil {
+		tx = nil
+	}
+
+	ids, err := m.IDs(ctx)
+	if err != nil {
+		return rollback(tx, fmt.Errorf("getting ids: %w", err))
+	}
+
+	for _, id := range ids {
+		todo, err := client.Todo.Get(ctx, id)
+		if err != nil {
+			return rollback(tx, err)
+		}
+
+		create := client.TodoHistory.Create()
+		if tx != nil {
+			create = tx.TodoHistory.Create()
+		}
+
+		create = create.
+			SetOperation(EntOpToHistoryOp(m.Op())).
+			SetHistoryTime(time.Now()).
+			SetRef(id)
+
+		if otherID, exists := m.OtherID(); exists {
+			create = create.SetOtherID(otherID)
+		} else {
+			create = create.SetOtherID(todo.OtherID)
+		}
+
+		if name, exists := m.Name(); exists {
+			create = create.SetName(name)
+		} else {
+			create = create.SetName(todo.Name)
+		}
+
+		_, err = create.Save(ctx)
+		if err != nil {
+			rollback(tx, err)
+		}
+	}
+
+	return nil
+}
+
+func (m *TodoMutation) CreateHistoryFromDelete(ctx context.Context) error {
+	client := m.Client()
+	tx, err := m.Tx()
+	if err != nil {
+		tx = nil
+	}
+
+	ids, err := m.IDs(ctx)
+	if err != nil {
+		return rollback(tx, fmt.Errorf("getting ids: %w", err))
+	}
+
+	for _, id := range ids {
+		todo, err := client.Todo.Get(ctx, id)
+		if err != nil {
+			return rollback(tx, err)
+		}
+
+		create := client.TodoHistory.Create()
+		if tx != nil {
+			create = tx.TodoHistory.Create()
+		}
+
+		_, err = create.
+			SetOperation(EntOpToHistoryOp(m.Op())).
+			SetHistoryTime(time.Now()).
+			SetRef(id).
+			SetOtherID(todo.OtherID).
+			SetName(todo.Name).
+			Save(ctx)
+		if err != nil {
+			rollback(tx, err)
+		}
+	}
+
+	return nil
 }

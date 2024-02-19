@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/flume/enthistory"
 	"github.com/google/uuid"
 	"github.com/nixxxon/entdemo/ent/predicate"
-	"github.com/nixxxon/entdemo/ent/schema/optype"
 	"github.com/nixxxon/entdemo/ent/todo"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 )
 
 // TodoWhereInput represents a where input for filtering Todo queries.
@@ -234,12 +234,12 @@ func (i *TodoWhereInput) P() (predicate.Todo, error) {
 	}
 }
 
-// TodoHackWhereInput represents a where input for filtering TodoHack queries.
-type TodoHackWhereInput struct {
-	Predicates []predicate.TodoHack  `json:"-"`
-	Not        *TodoHackWhereInput   `json:"not,omitempty"`
-	Or         []*TodoHackWhereInput `json:"or,omitempty"`
-	And        []*TodoHackWhereInput `json:"and,omitempty"`
+// TodoHistoryWhereInput represents a where input for filtering TodoHistory queries.
+type TodoHistoryWhereInput struct {
+	Predicates []predicate.TodoHistory  `json:"-"`
+	Not        *TodoHistoryWhereInput   `json:"not,omitempty"`
+	Or         []*TodoHistoryWhereInput `json:"or,omitempty"`
+	And        []*TodoHistoryWhereInput `json:"and,omitempty"`
 
 	// "id" field predicates.
 	ID      *uuid.UUID  `json:"id,omitempty"`
@@ -261,6 +261,12 @@ type TodoHackWhereInput struct {
 	HistoryTimeLT    *time.Time  `json:"historyTimeLT,omitempty"`
 	HistoryTimeLTE   *time.Time  `json:"historyTimeLTE,omitempty"`
 
+	// "operation" field predicates.
+	Operation      *enthistory.OpType  `json:"operation,omitempty"`
+	OperationNEQ   *enthistory.OpType  `json:"operationNEQ,omitempty"`
+	OperationIn    []enthistory.OpType `json:"operationIn,omitempty"`
+	OperationNotIn []enthistory.OpType `json:"operationNotIn,omitempty"`
+
 	// "ref" field predicates.
 	Ref       *uuid.UUID  `json:"ref,omitempty"`
 	RefNEQ    *uuid.UUID  `json:"refNEQ,omitempty"`
@@ -272,12 +278,6 @@ type TodoHackWhereInput struct {
 	RefLTE    *uuid.UUID  `json:"refLTE,omitempty"`
 	RefIsNil  bool        `json:"refIsNil,omitempty"`
 	RefNotNil bool        `json:"refNotNil,omitempty"`
-
-	// "operation" field predicates.
-	Operation      *optype.OpType  `json:"operation,omitempty"`
-	OperationNEQ   *optype.OpType  `json:"operationNEQ,omitempty"`
-	OperationIn    []optype.OpType `json:"operationIn,omitempty"`
-	OperationNotIn []optype.OpType `json:"operationNotIn,omitempty"`
 
 	// "other_id" field predicates.
 	OtherID       *uuid.UUID  `json:"otherID,omitempty"`
@@ -308,18 +308,18 @@ type TodoHackWhereInput struct {
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
-func (i *TodoHackWhereInput) AddPredicates(predicates ...predicate.TodoHack) {
+func (i *TodoHistoryWhereInput) AddPredicates(predicates ...predicate.TodoHistory) {
 	i.Predicates = append(i.Predicates, predicates...)
 }
 
-// Filter applies the TodoHackWhereInput filter on the TodoHackQuery builder.
-func (i *TodoHackWhereInput) Filter(q *TodoHackQuery) (*TodoHackQuery, error) {
+// Filter applies the TodoHistoryWhereInput filter on the TodoHistoryQuery builder.
+func (i *TodoHistoryWhereInput) Filter(q *TodoHistoryQuery) (*TodoHistoryQuery, error) {
 	if i == nil {
 		return q, nil
 	}
 	p, err := i.P()
 	if err != nil {
-		if err == ErrEmptyTodoHackWhereInput {
+		if err == ErrEmptyTodoHistoryWhereInput {
 			return q, nil
 		}
 		return nil, err
@@ -327,19 +327,19 @@ func (i *TodoHackWhereInput) Filter(q *TodoHackQuery) (*TodoHackQuery, error) {
 	return q.Where(p), nil
 }
 
-// ErrEmptyTodoHackWhereInput is returned in case the TodoHackWhereInput is empty.
-var ErrEmptyTodoHackWhereInput = errors.New("ent: empty predicate TodoHackWhereInput")
+// ErrEmptyTodoHistoryWhereInput is returned in case the TodoHistoryWhereInput is empty.
+var ErrEmptyTodoHistoryWhereInput = errors.New("ent: empty predicate TodoHistoryWhereInput")
 
-// P returns a predicate for filtering todohacks.
+// P returns a predicate for filtering todohistories.
 // An error is returned if the input is empty or invalid.
-func (i *TodoHackWhereInput) P() (predicate.TodoHack, error) {
-	var predicates []predicate.TodoHack
+func (i *TodoHistoryWhereInput) P() (predicate.TodoHistory, error) {
+	var predicates []predicate.TodoHistory
 	if i.Not != nil {
 		p, err := i.Not.P()
 		if err != nil {
 			return nil, fmt.Errorf("%w: field 'not'", err)
 		}
-		predicates = append(predicates, todohack.Not(p))
+		predicates = append(predicates, todohistory.Not(p))
 	}
 	switch n := len(i.Or); {
 	case n == 1:
@@ -349,7 +349,7 @@ func (i *TodoHackWhereInput) P() (predicate.TodoHack, error) {
 		}
 		predicates = append(predicates, p)
 	case n > 1:
-		or := make([]predicate.TodoHack, 0, n)
+		or := make([]predicate.TodoHistory, 0, n)
 		for _, w := range i.Or {
 			p, err := w.P()
 			if err != nil {
@@ -357,7 +357,7 @@ func (i *TodoHackWhereInput) P() (predicate.TodoHack, error) {
 			}
 			or = append(or, p)
 		}
-		predicates = append(predicates, todohack.Or(or...))
+		predicates = append(predicates, todohistory.Or(or...))
 	}
 	switch n := len(i.And); {
 	case n == 1:
@@ -367,7 +367,7 @@ func (i *TodoHackWhereInput) P() (predicate.TodoHack, error) {
 		}
 		predicates = append(predicates, p)
 	case n > 1:
-		and := make([]predicate.TodoHack, 0, n)
+		and := make([]predicate.TodoHistory, 0, n)
 		for _, w := range i.And {
 			p, err := w.P()
 			if err != nil {
@@ -375,175 +375,175 @@ func (i *TodoHackWhereInput) P() (predicate.TodoHack, error) {
 			}
 			and = append(and, p)
 		}
-		predicates = append(predicates, todohack.And(and...))
+		predicates = append(predicates, todohistory.And(and...))
 	}
 	predicates = append(predicates, i.Predicates...)
 	if i.ID != nil {
-		predicates = append(predicates, todohack.IDEQ(*i.ID))
+		predicates = append(predicates, todohistory.IDEQ(*i.ID))
 	}
 	if i.IDNEQ != nil {
-		predicates = append(predicates, todohack.IDNEQ(*i.IDNEQ))
+		predicates = append(predicates, todohistory.IDNEQ(*i.IDNEQ))
 	}
 	if len(i.IDIn) > 0 {
-		predicates = append(predicates, todohack.IDIn(i.IDIn...))
+		predicates = append(predicates, todohistory.IDIn(i.IDIn...))
 	}
 	if len(i.IDNotIn) > 0 {
-		predicates = append(predicates, todohack.IDNotIn(i.IDNotIn...))
+		predicates = append(predicates, todohistory.IDNotIn(i.IDNotIn...))
 	}
 	if i.IDGT != nil {
-		predicates = append(predicates, todohack.IDGT(*i.IDGT))
+		predicates = append(predicates, todohistory.IDGT(*i.IDGT))
 	}
 	if i.IDGTE != nil {
-		predicates = append(predicates, todohack.IDGTE(*i.IDGTE))
+		predicates = append(predicates, todohistory.IDGTE(*i.IDGTE))
 	}
 	if i.IDLT != nil {
-		predicates = append(predicates, todohack.IDLT(*i.IDLT))
+		predicates = append(predicates, todohistory.IDLT(*i.IDLT))
 	}
 	if i.IDLTE != nil {
-		predicates = append(predicates, todohack.IDLTE(*i.IDLTE))
+		predicates = append(predicates, todohistory.IDLTE(*i.IDLTE))
 	}
 	if i.HistoryTime != nil {
-		predicates = append(predicates, todohack.HistoryTimeEQ(*i.HistoryTime))
+		predicates = append(predicates, todohistory.HistoryTimeEQ(*i.HistoryTime))
 	}
 	if i.HistoryTimeNEQ != nil {
-		predicates = append(predicates, todohack.HistoryTimeNEQ(*i.HistoryTimeNEQ))
+		predicates = append(predicates, todohistory.HistoryTimeNEQ(*i.HistoryTimeNEQ))
 	}
 	if len(i.HistoryTimeIn) > 0 {
-		predicates = append(predicates, todohack.HistoryTimeIn(i.HistoryTimeIn...))
+		predicates = append(predicates, todohistory.HistoryTimeIn(i.HistoryTimeIn...))
 	}
 	if len(i.HistoryTimeNotIn) > 0 {
-		predicates = append(predicates, todohack.HistoryTimeNotIn(i.HistoryTimeNotIn...))
+		predicates = append(predicates, todohistory.HistoryTimeNotIn(i.HistoryTimeNotIn...))
 	}
 	if i.HistoryTimeGT != nil {
-		predicates = append(predicates, todohack.HistoryTimeGT(*i.HistoryTimeGT))
+		predicates = append(predicates, todohistory.HistoryTimeGT(*i.HistoryTimeGT))
 	}
 	if i.HistoryTimeGTE != nil {
-		predicates = append(predicates, todohack.HistoryTimeGTE(*i.HistoryTimeGTE))
+		predicates = append(predicates, todohistory.HistoryTimeGTE(*i.HistoryTimeGTE))
 	}
 	if i.HistoryTimeLT != nil {
-		predicates = append(predicates, todohack.HistoryTimeLT(*i.HistoryTimeLT))
+		predicates = append(predicates, todohistory.HistoryTimeLT(*i.HistoryTimeLT))
 	}
 	if i.HistoryTimeLTE != nil {
-		predicates = append(predicates, todohack.HistoryTimeLTE(*i.HistoryTimeLTE))
-	}
-	if i.Ref != nil {
-		predicates = append(predicates, todohack.RefEQ(*i.Ref))
-	}
-	if i.RefNEQ != nil {
-		predicates = append(predicates, todohack.RefNEQ(*i.RefNEQ))
-	}
-	if len(i.RefIn) > 0 {
-		predicates = append(predicates, todohack.RefIn(i.RefIn...))
-	}
-	if len(i.RefNotIn) > 0 {
-		predicates = append(predicates, todohack.RefNotIn(i.RefNotIn...))
-	}
-	if i.RefGT != nil {
-		predicates = append(predicates, todohack.RefGT(*i.RefGT))
-	}
-	if i.RefGTE != nil {
-		predicates = append(predicates, todohack.RefGTE(*i.RefGTE))
-	}
-	if i.RefLT != nil {
-		predicates = append(predicates, todohack.RefLT(*i.RefLT))
-	}
-	if i.RefLTE != nil {
-		predicates = append(predicates, todohack.RefLTE(*i.RefLTE))
-	}
-	if i.RefIsNil {
-		predicates = append(predicates, todohack.RefIsNil())
-	}
-	if i.RefNotNil {
-		predicates = append(predicates, todohack.RefNotNil())
+		predicates = append(predicates, todohistory.HistoryTimeLTE(*i.HistoryTimeLTE))
 	}
 	if i.Operation != nil {
-		predicates = append(predicates, todohack.OperationEQ(*i.Operation))
+		predicates = append(predicates, todohistory.OperationEQ(*i.Operation))
 	}
 	if i.OperationNEQ != nil {
-		predicates = append(predicates, todohack.OperationNEQ(*i.OperationNEQ))
+		predicates = append(predicates, todohistory.OperationNEQ(*i.OperationNEQ))
 	}
 	if len(i.OperationIn) > 0 {
-		predicates = append(predicates, todohack.OperationIn(i.OperationIn...))
+		predicates = append(predicates, todohistory.OperationIn(i.OperationIn...))
 	}
 	if len(i.OperationNotIn) > 0 {
-		predicates = append(predicates, todohack.OperationNotIn(i.OperationNotIn...))
+		predicates = append(predicates, todohistory.OperationNotIn(i.OperationNotIn...))
+	}
+	if i.Ref != nil {
+		predicates = append(predicates, todohistory.RefEQ(*i.Ref))
+	}
+	if i.RefNEQ != nil {
+		predicates = append(predicates, todohistory.RefNEQ(*i.RefNEQ))
+	}
+	if len(i.RefIn) > 0 {
+		predicates = append(predicates, todohistory.RefIn(i.RefIn...))
+	}
+	if len(i.RefNotIn) > 0 {
+		predicates = append(predicates, todohistory.RefNotIn(i.RefNotIn...))
+	}
+	if i.RefGT != nil {
+		predicates = append(predicates, todohistory.RefGT(*i.RefGT))
+	}
+	if i.RefGTE != nil {
+		predicates = append(predicates, todohistory.RefGTE(*i.RefGTE))
+	}
+	if i.RefLT != nil {
+		predicates = append(predicates, todohistory.RefLT(*i.RefLT))
+	}
+	if i.RefLTE != nil {
+		predicates = append(predicates, todohistory.RefLTE(*i.RefLTE))
+	}
+	if i.RefIsNil {
+		predicates = append(predicates, todohistory.RefIsNil())
+	}
+	if i.RefNotNil {
+		predicates = append(predicates, todohistory.RefNotNil())
 	}
 	if i.OtherID != nil {
-		predicates = append(predicates, todohack.OtherIDEQ(*i.OtherID))
+		predicates = append(predicates, todohistory.OtherIDEQ(*i.OtherID))
 	}
 	if i.OtherIDNEQ != nil {
-		predicates = append(predicates, todohack.OtherIDNEQ(*i.OtherIDNEQ))
+		predicates = append(predicates, todohistory.OtherIDNEQ(*i.OtherIDNEQ))
 	}
 	if len(i.OtherIDIn) > 0 {
-		predicates = append(predicates, todohack.OtherIDIn(i.OtherIDIn...))
+		predicates = append(predicates, todohistory.OtherIDIn(i.OtherIDIn...))
 	}
 	if len(i.OtherIDNotIn) > 0 {
-		predicates = append(predicates, todohack.OtherIDNotIn(i.OtherIDNotIn...))
+		predicates = append(predicates, todohistory.OtherIDNotIn(i.OtherIDNotIn...))
 	}
 	if i.OtherIDGT != nil {
-		predicates = append(predicates, todohack.OtherIDGT(*i.OtherIDGT))
+		predicates = append(predicates, todohistory.OtherIDGT(*i.OtherIDGT))
 	}
 	if i.OtherIDGTE != nil {
-		predicates = append(predicates, todohack.OtherIDGTE(*i.OtherIDGTE))
+		predicates = append(predicates, todohistory.OtherIDGTE(*i.OtherIDGTE))
 	}
 	if i.OtherIDLT != nil {
-		predicates = append(predicates, todohack.OtherIDLT(*i.OtherIDLT))
+		predicates = append(predicates, todohistory.OtherIDLT(*i.OtherIDLT))
 	}
 	if i.OtherIDLTE != nil {
-		predicates = append(predicates, todohack.OtherIDLTE(*i.OtherIDLTE))
+		predicates = append(predicates, todohistory.OtherIDLTE(*i.OtherIDLTE))
 	}
 	if i.OtherIDIsNil {
-		predicates = append(predicates, todohack.OtherIDIsNil())
+		predicates = append(predicates, todohistory.OtherIDIsNil())
 	}
 	if i.OtherIDNotNil {
-		predicates = append(predicates, todohack.OtherIDNotNil())
+		predicates = append(predicates, todohistory.OtherIDNotNil())
 	}
 	if i.Name != nil {
-		predicates = append(predicates, todohack.NameEQ(*i.Name))
+		predicates = append(predicates, todohistory.NameEQ(*i.Name))
 	}
 	if i.NameNEQ != nil {
-		predicates = append(predicates, todohack.NameNEQ(*i.NameNEQ))
+		predicates = append(predicates, todohistory.NameNEQ(*i.NameNEQ))
 	}
 	if len(i.NameIn) > 0 {
-		predicates = append(predicates, todohack.NameIn(i.NameIn...))
+		predicates = append(predicates, todohistory.NameIn(i.NameIn...))
 	}
 	if len(i.NameNotIn) > 0 {
-		predicates = append(predicates, todohack.NameNotIn(i.NameNotIn...))
+		predicates = append(predicates, todohistory.NameNotIn(i.NameNotIn...))
 	}
 	if i.NameGT != nil {
-		predicates = append(predicates, todohack.NameGT(*i.NameGT))
+		predicates = append(predicates, todohistory.NameGT(*i.NameGT))
 	}
 	if i.NameGTE != nil {
-		predicates = append(predicates, todohack.NameGTE(*i.NameGTE))
+		predicates = append(predicates, todohistory.NameGTE(*i.NameGTE))
 	}
 	if i.NameLT != nil {
-		predicates = append(predicates, todohack.NameLT(*i.NameLT))
+		predicates = append(predicates, todohistory.NameLT(*i.NameLT))
 	}
 	if i.NameLTE != nil {
-		predicates = append(predicates, todohack.NameLTE(*i.NameLTE))
+		predicates = append(predicates, todohistory.NameLTE(*i.NameLTE))
 	}
 	if i.NameContains != nil {
-		predicates = append(predicates, todohack.NameContains(*i.NameContains))
+		predicates = append(predicates, todohistory.NameContains(*i.NameContains))
 	}
 	if i.NameHasPrefix != nil {
-		predicates = append(predicates, todohack.NameHasPrefix(*i.NameHasPrefix))
+		predicates = append(predicates, todohistory.NameHasPrefix(*i.NameHasPrefix))
 	}
 	if i.NameHasSuffix != nil {
-		predicates = append(predicates, todohack.NameHasSuffix(*i.NameHasSuffix))
+		predicates = append(predicates, todohistory.NameHasSuffix(*i.NameHasSuffix))
 	}
 	if i.NameEqualFold != nil {
-		predicates = append(predicates, todohack.NameEqualFold(*i.NameEqualFold))
+		predicates = append(predicates, todohistory.NameEqualFold(*i.NameEqualFold))
 	}
 	if i.NameContainsFold != nil {
-		predicates = append(predicates, todohack.NameContainsFold(*i.NameContainsFold))
+		predicates = append(predicates, todohistory.NameContainsFold(*i.NameContainsFold))
 	}
 
 	switch len(predicates) {
 	case 0:
-		return nil, ErrEmptyTodoHackWhereInput
+		return nil, ErrEmptyTodoHistoryWhereInput
 	case 1:
 		return predicates[0], nil
 	default:
-		return todohack.And(predicates...), nil
+		return todohistory.And(predicates...), nil
 	}
 }

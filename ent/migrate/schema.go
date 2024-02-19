@@ -25,8 +25,8 @@ var (
 	TodoHistoryColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "history_time", Type: field.TypeTime},
-		{Name: "ref", Type: field.TypeUUID, Nullable: true},
 		{Name: "operation", Type: field.TypeEnum, Enums: []string{"INSERT", "UPDATE", "DELETE"}},
+		{Name: "ref", Type: field.TypeUUID, Nullable: true},
 		{Name: "other_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 	}

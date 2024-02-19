@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-multierror"
 	"github.com/nixxxon/entdemo/ent/todo"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 )
 
 // Noder wraps the basic Node method.
@@ -24,10 +24,10 @@ var todoImplementors = []string{"Todo", "Node"}
 // IsNode implements the Node interface check for GQLGen.
 func (*Todo) IsNode() {}
 
-var todohackImplementors = []string{"TodoHack", "Node"}
+var todohistoryImplementors = []string{"TodoHistory", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (*TodoHack) IsNode() {}
+func (*TodoHistory) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -99,10 +99,10 @@ func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, 
 			return nil, err
 		}
 		return n, nil
-	case todohack.Table:
-		query := c.TodoHack.Query().
-			Where(todohack.ID(id))
-		query, err := query.CollectFields(ctx, todohackImplementors...)
+	case todohistory.Table:
+		query := c.TodoHistory.Query().
+			Where(todohistory.ID(id))
+		query, err := query.CollectFields(ctx, todohistoryImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -200,10 +200,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 				*noder = node
 			}
 		}
-	case todohack.Table:
-		query := c.TodoHack.Query().
-			Where(todohack.IDIn(ids...))
-		query, err := query.CollectFields(ctx, todohackImplementors...)
+	case todohistory.Table:
+		query := c.TodoHistory.Query().
+			Where(todohistory.IDIn(ids...))
+		query, err := query.CollectFields(ctx, todohistoryImplementors...)
 		if err != nil {
 			return nil, err
 		}

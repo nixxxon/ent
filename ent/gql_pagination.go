@@ -16,7 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/errcode"
 	"github.com/google/uuid"
 	"github.com/nixxxon/entdemo/ent/todo"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -395,20 +395,20 @@ func (t *Todo) ToEdge(order *TodoOrder) *TodoEdge {
 	}
 }
 
-// TodoHackEdge is the edge representation of TodoHack.
-type TodoHackEdge struct {
-	Node   *TodoHack `json:"node"`
-	Cursor Cursor    `json:"cursor"`
+// TodoHistoryEdge is the edge representation of TodoHistory.
+type TodoHistoryEdge struct {
+	Node   *TodoHistory `json:"node"`
+	Cursor Cursor       `json:"cursor"`
 }
 
-// TodoHackConnection is the connection containing edges to TodoHack.
-type TodoHackConnection struct {
-	Edges      []*TodoHackEdge `json:"edges"`
-	PageInfo   PageInfo        `json:"pageInfo"`
-	TotalCount int             `json:"totalCount"`
+// TodoHistoryConnection is the connection containing edges to TodoHistory.
+type TodoHistoryConnection struct {
+	Edges      []*TodoHistoryEdge `json:"edges"`
+	PageInfo   PageInfo           `json:"pageInfo"`
+	TotalCount int                `json:"totalCount"`
 }
 
-func (c *TodoHackConnection) build(nodes []*TodoHack, pager *todohackPager, after *Cursor, first *int, before *Cursor, last *int) {
+func (c *TodoHistoryConnection) build(nodes []*TodoHistory, pager *todohistoryPager, after *Cursor, first *int, before *Cursor, last *int) {
 	c.PageInfo.HasNextPage = before != nil
 	c.PageInfo.HasPreviousPage = after != nil
 	if first != nil && *first+1 == len(nodes) {
@@ -418,21 +418,21 @@ func (c *TodoHackConnection) build(nodes []*TodoHack, pager *todohackPager, afte
 		c.PageInfo.HasPreviousPage = true
 		nodes = nodes[:len(nodes)-1]
 	}
-	var nodeAt func(int) *TodoHack
+	var nodeAt func(int) *TodoHistory
 	if last != nil {
 		n := len(nodes) - 1
-		nodeAt = func(i int) *TodoHack {
+		nodeAt = func(i int) *TodoHistory {
 			return nodes[n-i]
 		}
 	} else {
-		nodeAt = func(i int) *TodoHack {
+		nodeAt = func(i int) *TodoHistory {
 			return nodes[i]
 		}
 	}
-	c.Edges = make([]*TodoHackEdge, len(nodes))
+	c.Edges = make([]*TodoHistoryEdge, len(nodes))
 	for i := range nodes {
 		node := nodeAt(i)
-		c.Edges[i] = &TodoHackEdge{
+		c.Edges[i] = &TodoHistoryEdge{
 			Node:   node,
 			Cursor: pager.toCursor(node),
 		}
@@ -446,87 +446,87 @@ func (c *TodoHackConnection) build(nodes []*TodoHack, pager *todohackPager, afte
 	}
 }
 
-// TodoHackPaginateOption enables pagination customization.
-type TodoHackPaginateOption func(*todohackPager) error
+// TodoHistoryPaginateOption enables pagination customization.
+type TodoHistoryPaginateOption func(*todohistoryPager) error
 
-// WithTodoHackOrder configures pagination ordering.
-func WithTodoHackOrder(order *TodoHackOrder) TodoHackPaginateOption {
+// WithTodoHistoryOrder configures pagination ordering.
+func WithTodoHistoryOrder(order *TodoHistoryOrder) TodoHistoryPaginateOption {
 	if order == nil {
-		order = DefaultTodoHackOrder
+		order = DefaultTodoHistoryOrder
 	}
 	o := *order
-	return func(pager *todohackPager) error {
+	return func(pager *todohistoryPager) error {
 		if err := o.Direction.Validate(); err != nil {
 			return err
 		}
 		if o.Field == nil {
-			o.Field = DefaultTodoHackOrder.Field
+			o.Field = DefaultTodoHistoryOrder.Field
 		}
 		pager.order = &o
 		return nil
 	}
 }
 
-// WithTodoHackFilter configures pagination filter.
-func WithTodoHackFilter(filter func(*TodoHackQuery) (*TodoHackQuery, error)) TodoHackPaginateOption {
-	return func(pager *todohackPager) error {
+// WithTodoHistoryFilter configures pagination filter.
+func WithTodoHistoryFilter(filter func(*TodoHistoryQuery) (*TodoHistoryQuery, error)) TodoHistoryPaginateOption {
+	return func(pager *todohistoryPager) error {
 		if filter == nil {
-			return errors.New("TodoHackQuery filter cannot be nil")
+			return errors.New("TodoHistoryQuery filter cannot be nil")
 		}
 		pager.filter = filter
 		return nil
 	}
 }
 
-type todohackPager struct {
+type todohistoryPager struct {
 	reverse bool
-	order   *TodoHackOrder
-	filter  func(*TodoHackQuery) (*TodoHackQuery, error)
+	order   *TodoHistoryOrder
+	filter  func(*TodoHistoryQuery) (*TodoHistoryQuery, error)
 }
 
-func newTodoHackPager(opts []TodoHackPaginateOption, reverse bool) (*todohackPager, error) {
-	pager := &todohackPager{reverse: reverse}
+func newTodoHistoryPager(opts []TodoHistoryPaginateOption, reverse bool) (*todohistoryPager, error) {
+	pager := &todohistoryPager{reverse: reverse}
 	for _, opt := range opts {
 		if err := opt(pager); err != nil {
 			return nil, err
 		}
 	}
 	if pager.order == nil {
-		pager.order = DefaultTodoHackOrder
+		pager.order = DefaultTodoHistoryOrder
 	}
 	return pager, nil
 }
 
-func (p *todohackPager) applyFilter(query *TodoHackQuery) (*TodoHackQuery, error) {
+func (p *todohistoryPager) applyFilter(query *TodoHistoryQuery) (*TodoHistoryQuery, error) {
 	if p.filter != nil {
 		return p.filter(query)
 	}
 	return query, nil
 }
 
-func (p *todohackPager) toCursor(th *TodoHack) Cursor {
+func (p *todohistoryPager) toCursor(th *TodoHistory) Cursor {
 	return p.order.Field.toCursor(th)
 }
 
-func (p *todohackPager) applyCursors(query *TodoHackQuery, after, before *Cursor) (*TodoHackQuery, error) {
+func (p *todohistoryPager) applyCursors(query *TodoHistoryQuery, after, before *Cursor) (*TodoHistoryQuery, error) {
 	direction := p.order.Direction
 	if p.reverse {
 		direction = direction.Reverse()
 	}
-	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultTodoHackOrder.Field.column, p.order.Field.column, direction) {
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultTodoHistoryOrder.Field.column, p.order.Field.column, direction) {
 		query = query.Where(predicate)
 	}
 	return query, nil
 }
 
-func (p *todohackPager) applyOrder(query *TodoHackQuery) *TodoHackQuery {
+func (p *todohistoryPager) applyOrder(query *TodoHistoryQuery) *TodoHistoryQuery {
 	direction := p.order.Direction
 	if p.reverse {
 		direction = direction.Reverse()
 	}
 	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
-	if p.order.Field != DefaultTodoHackOrder.Field {
-		query = query.Order(DefaultTodoHackOrder.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultTodoHistoryOrder.Field {
+		query = query.Order(DefaultTodoHistoryOrder.Field.toTerm(direction.OrderTermOption()))
 	}
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(p.order.Field.column)
@@ -534,7 +534,7 @@ func (p *todohackPager) applyOrder(query *TodoHackQuery) *TodoHackQuery {
 	return query
 }
 
-func (p *todohackPager) orderExpr(query *TodoHackQuery) sql.Querier {
+func (p *todohistoryPager) orderExpr(query *TodoHistoryQuery) sql.Querier {
 	direction := p.order.Direction
 	if p.reverse {
 		direction = direction.Reverse()
@@ -544,28 +544,28 @@ func (p *todohackPager) orderExpr(query *TodoHackQuery) sql.Querier {
 	}
 	return sql.ExprFunc(func(b *sql.Builder) {
 		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
-		if p.order.Field != DefaultTodoHackOrder.Field {
-			b.Comma().Ident(DefaultTodoHackOrder.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultTodoHistoryOrder.Field {
+			b.Comma().Ident(DefaultTodoHistoryOrder.Field.column).Pad().WriteString(string(direction))
 		}
 	})
 }
 
-// Paginate executes the query and returns a relay based cursor connection to TodoHack.
-func (th *TodoHackQuery) Paginate(
+// Paginate executes the query and returns a relay based cursor connection to TodoHistory.
+func (th *TodoHistoryQuery) Paginate(
 	ctx context.Context, after *Cursor, first *int,
-	before *Cursor, last *int, opts ...TodoHackPaginateOption,
-) (*TodoHackConnection, error) {
+	before *Cursor, last *int, opts ...TodoHistoryPaginateOption,
+) (*TodoHistoryConnection, error) {
 	if err := validateFirstLast(first, last); err != nil {
 		return nil, err
 	}
-	pager, err := newTodoHackPager(opts, last != nil)
+	pager, err := newTodoHistoryPager(opts, last != nil)
 	if err != nil {
 		return nil, err
 	}
 	if th, err = pager.applyFilter(th); err != nil {
 		return nil, err
 	}
-	conn := &TodoHackConnection{Edges: []*TodoHackEdge{}}
+	conn := &TodoHistoryConnection{Edges: []*TodoHistoryEdge{}}
 	ignoredEdges := !hasCollectedField(ctx, edgesField)
 	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
 		hasPagination := after != nil || first != nil || before != nil || last != nil
@@ -603,14 +603,14 @@ func (th *TodoHackQuery) Paginate(
 }
 
 var (
-	// TodoHackOrderFieldName orders TodoHack by name.
-	TodoHackOrderFieldName = &TodoHackOrderField{
-		Value: func(th *TodoHack) (ent.Value, error) {
+	// TodoHistoryOrderFieldName orders TodoHistory by name.
+	TodoHistoryOrderFieldName = &TodoHistoryOrderField{
+		Value: func(th *TodoHistory) (ent.Value, error) {
 			return th.Name, nil
 		},
-		column: todohack.FieldName,
-		toTerm: todohack.ByName,
-		toCursor: func(th *TodoHack) Cursor {
+		column: todohistory.FieldName,
+		toTerm: todohistory.ByName,
+		toCursor: func(th *TodoHistory) Cursor {
 			return Cursor{
 				ID:    th.ID,
 				Value: th.Name,
@@ -620,71 +620,71 @@ var (
 )
 
 // String implement fmt.Stringer interface.
-func (f TodoHackOrderField) String() string {
+func (f TodoHistoryOrderField) String() string {
 	var str string
 	switch f.column {
-	case TodoHackOrderFieldName.column:
+	case TodoHistoryOrderFieldName.column:
 		str = "NAME"
 	}
 	return str
 }
 
 // MarshalGQL implements graphql.Marshaler interface.
-func (f TodoHackOrderField) MarshalGQL(w io.Writer) {
+func (f TodoHistoryOrderField) MarshalGQL(w io.Writer) {
 	io.WriteString(w, strconv.Quote(f.String()))
 }
 
 // UnmarshalGQL implements graphql.Unmarshaler interface.
-func (f *TodoHackOrderField) UnmarshalGQL(v interface{}) error {
+func (f *TodoHistoryOrderField) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
-		return fmt.Errorf("TodoHackOrderField %T must be a string", v)
+		return fmt.Errorf("TodoHistoryOrderField %T must be a string", v)
 	}
 	switch str {
 	case "NAME":
-		*f = *TodoHackOrderFieldName
+		*f = *TodoHistoryOrderFieldName
 	default:
-		return fmt.Errorf("%s is not a valid TodoHackOrderField", str)
+		return fmt.Errorf("%s is not a valid TodoHistoryOrderField", str)
 	}
 	return nil
 }
 
-// TodoHackOrderField defines the ordering field of TodoHack.
-type TodoHackOrderField struct {
-	// Value extracts the ordering value from the given TodoHack.
-	Value    func(*TodoHack) (ent.Value, error)
+// TodoHistoryOrderField defines the ordering field of TodoHistory.
+type TodoHistoryOrderField struct {
+	// Value extracts the ordering value from the given TodoHistory.
+	Value    func(*TodoHistory) (ent.Value, error)
 	column   string // field or computed.
-	toTerm   func(...sql.OrderTermOption) todohack.OrderOption
-	toCursor func(*TodoHack) Cursor
+	toTerm   func(...sql.OrderTermOption) todohistory.OrderOption
+	toCursor func(*TodoHistory) Cursor
 }
 
-// TodoHackOrder defines the ordering of TodoHack.
-type TodoHackOrder struct {
-	Direction OrderDirection      `json:"direction"`
-	Field     *TodoHackOrderField `json:"field"`
+// TodoHistoryOrder defines the ordering of TodoHistory.
+type TodoHistoryOrder struct {
+	Direction OrderDirection         `json:"direction"`
+	Field     *TodoHistoryOrderField `json:"field"`
 }
 
-// DefaultTodoHackOrder is the default ordering of TodoHack.
-var DefaultTodoHackOrder = &TodoHackOrder{
+// DefaultTodoHistoryOrder is the default ordering of TodoHistory.
+var DefaultTodoHistoryOrder = &TodoHistoryOrder{
 	Direction: entgql.OrderDirectionAsc,
-	Field: &TodoHackOrderField{
-		Value: func(th *TodoHack) (ent.Value, error) {
+	Field: &TodoHistoryOrderField{
+		Value: func(th *TodoHistory) (ent.Value, error) {
 			return th.ID, nil
 		},
-		column: todohack.FieldID,
-		toTerm: todohack.ByID,
-		toCursor: func(th *TodoHack) Cursor {
+		column: todohistory.FieldID,
+		toTerm: todohistory.ByID,
+		toCursor: func(th *TodoHistory) Cursor {
 			return Cursor{ID: th.ID}
 		},
 	},
 }
 
-// ToEdge converts TodoHack into TodoHackEdge.
-func (th *TodoHack) ToEdge(order *TodoHackOrder) *TodoHackEdge {
+// ToEdge converts TodoHistory into TodoHistoryEdge.
+func (th *TodoHistory) ToEdge(order *TodoHistoryOrder) *TodoHistoryEdge {
 	if order == nil {
-		order = DefaultTodoHackOrder
+		order = DefaultTodoHistoryOrder
 	}
-	return &TodoHackEdge{
+	return &TodoHistoryEdge{
 		Node:   th,
 		Cursor: order.Field.toCursor(th),
 	}

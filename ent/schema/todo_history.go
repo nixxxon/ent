@@ -2,6 +2,7 @@
 package schema
 
 import (
+    "entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
@@ -39,19 +40,15 @@ func (TodoHistory) Fields() []ent.Field {
             Immutable(),
         field.UUID("ref", uuid.UUID{}).
             Immutable().
-            Optional(),
+            Optional().
+            Annotations(entgql.Annotation{Type: "ID"}),
         field.Enum("operation").
             GoType(enthistory.OpType("")).
             Immutable(),
     }
 
-
     original := Todo{}
-    for _, field := range original.Fields() {
-        if field.Descriptor().Name != "id" {
-            historyFields = append(historyFields, field)
-        }
-    }
+    historyFields = append(historyFields, original.Fields()...)
 
     return historyFields
 }

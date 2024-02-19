@@ -4,7 +4,7 @@ package ent
 
 import (
 	"github.com/nixxxon/entdemo/ent/todo"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -32,20 +32,20 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
-			Table:   todohack.Table,
-			Columns: todohack.Columns,
+			Table:   todohistory.Table,
+			Columns: todohistory.Columns,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeUUID,
-				Column: todohack.FieldID,
+				Column: todohistory.FieldID,
 			},
 		},
-		Type: "TodoHack",
+		Type: "TodoHistory",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			todohack.FieldHistoryTime: {Type: field.TypeTime, Column: todohack.FieldHistoryTime},
-			todohack.FieldRef:         {Type: field.TypeUUID, Column: todohack.FieldRef},
-			todohack.FieldOperation:   {Type: field.TypeEnum, Column: todohack.FieldOperation},
-			todohack.FieldOtherID:     {Type: field.TypeUUID, Column: todohack.FieldOtherID},
-			todohack.FieldName:        {Type: field.TypeString, Column: todohack.FieldName},
+			todohistory.FieldHistoryTime: {Type: field.TypeTime, Column: todohistory.FieldHistoryTime},
+			todohistory.FieldOperation:   {Type: field.TypeEnum, Column: todohistory.FieldOperation},
+			todohistory.FieldRef:         {Type: field.TypeUUID, Column: todohistory.FieldRef},
+			todohistory.FieldOtherID:     {Type: field.TypeUUID, Column: todohistory.FieldOtherID},
+			todohistory.FieldName:        {Type: field.TypeString, Column: todohistory.FieldName},
 		},
 	}
 	return graph
@@ -108,33 +108,33 @@ func (f *TodoFilter) WhereName(p entql.StringP) {
 }
 
 // addPredicate implements the predicateAdder interface.
-func (thq *TodoHackQuery) addPredicate(pred func(s *sql.Selector)) {
+func (thq *TodoHistoryQuery) addPredicate(pred func(s *sql.Selector)) {
 	thq.predicates = append(thq.predicates, pred)
 }
 
-// Filter returns a Filter implementation to apply filters on the TodoHackQuery builder.
-func (thq *TodoHackQuery) Filter() *TodoHackFilter {
-	return &TodoHackFilter{config: thq.config, predicateAdder: thq}
+// Filter returns a Filter implementation to apply filters on the TodoHistoryQuery builder.
+func (thq *TodoHistoryQuery) Filter() *TodoHistoryFilter {
+	return &TodoHistoryFilter{config: thq.config, predicateAdder: thq}
 }
 
 // addPredicate implements the predicateAdder interface.
-func (m *TodoHackMutation) addPredicate(pred func(s *sql.Selector)) {
+func (m *TodoHistoryMutation) addPredicate(pred func(s *sql.Selector)) {
 	m.predicates = append(m.predicates, pred)
 }
 
-// Filter returns an entql.Where implementation to apply filters on the TodoHackMutation builder.
-func (m *TodoHackMutation) Filter() *TodoHackFilter {
-	return &TodoHackFilter{config: m.config, predicateAdder: m}
+// Filter returns an entql.Where implementation to apply filters on the TodoHistoryMutation builder.
+func (m *TodoHistoryMutation) Filter() *TodoHistoryFilter {
+	return &TodoHistoryFilter{config: m.config, predicateAdder: m}
 }
 
-// TodoHackFilter provides a generic filtering capability at runtime for TodoHackQuery.
-type TodoHackFilter struct {
+// TodoHistoryFilter provides a generic filtering capability at runtime for TodoHistoryQuery.
+type TodoHistoryFilter struct {
 	predicateAdder
 	config
 }
 
 // Where applies the entql predicate on the query filter.
-func (f *TodoHackFilter) Where(p entql.P) {
+func (f *TodoHistoryFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
 		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
 			s.AddError(err)
@@ -143,31 +143,31 @@ func (f *TodoHackFilter) Where(p entql.P) {
 }
 
 // WhereID applies the entql [16]byte predicate on the id field.
-func (f *TodoHackFilter) WhereID(p entql.ValueP) {
-	f.Where(p.Field(todohack.FieldID))
+func (f *TodoHistoryFilter) WhereID(p entql.ValueP) {
+	f.Where(p.Field(todohistory.FieldID))
 }
 
 // WhereHistoryTime applies the entql time.Time predicate on the history_time field.
-func (f *TodoHackFilter) WhereHistoryTime(p entql.TimeP) {
-	f.Where(p.Field(todohack.FieldHistoryTime))
-}
-
-// WhereRef applies the entql [16]byte predicate on the ref field.
-func (f *TodoHackFilter) WhereRef(p entql.ValueP) {
-	f.Where(p.Field(todohack.FieldRef))
+func (f *TodoHistoryFilter) WhereHistoryTime(p entql.TimeP) {
+	f.Where(p.Field(todohistory.FieldHistoryTime))
 }
 
 // WhereOperation applies the entql string predicate on the operation field.
-func (f *TodoHackFilter) WhereOperation(p entql.StringP) {
-	f.Where(p.Field(todohack.FieldOperation))
+func (f *TodoHistoryFilter) WhereOperation(p entql.StringP) {
+	f.Where(p.Field(todohistory.FieldOperation))
+}
+
+// WhereRef applies the entql [16]byte predicate on the ref field.
+func (f *TodoHistoryFilter) WhereRef(p entql.ValueP) {
+	f.Where(p.Field(todohistory.FieldRef))
 }
 
 // WhereOtherID applies the entql [16]byte predicate on the other_id field.
-func (f *TodoHackFilter) WhereOtherID(p entql.ValueP) {
-	f.Where(p.Field(todohack.FieldOtherID))
+func (f *TodoHistoryFilter) WhereOtherID(p entql.ValueP) {
+	f.Where(p.Field(todohistory.FieldOtherID))
 }
 
 // WhereName applies the entql string predicate on the name field.
-func (f *TodoHackFilter) WhereName(p entql.StringP) {
-	f.Where(p.Field(todohack.FieldName))
+func (f *TodoHistoryFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(todohistory.FieldName))
 }

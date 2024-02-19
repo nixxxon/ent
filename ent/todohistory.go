@@ -9,22 +9,22 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/flume/enthistory"
 	"github.com/google/uuid"
-	"github.com/nixxxon/entdemo/ent/schema/optype"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 )
 
-// TodoHack is the model entity for the TodoHack schema.
-type TodoHack struct {
+// TodoHistory is the model entity for the TodoHistory schema.
+type TodoHistory struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
 	// HistoryTime holds the value of the "history_time" field.
 	HistoryTime time.Time `json:"history_time,omitempty"`
+	// Operation holds the value of the "operation" field.
+	Operation enthistory.OpType `json:"operation,omitempty"`
 	// Ref holds the value of the "ref" field.
 	Ref uuid.UUID `json:"ref,omitempty"`
-	// Operation holds the value of the "operation" field.
-	Operation optype.OpType `json:"operation,omitempty"`
 	// OtherID holds the value of the "other_id" field.
 	OtherID uuid.UUID `json:"other_id,omitempty"`
 	// Name holds the value of the "name" field.
@@ -33,15 +33,15 @@ type TodoHack struct {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*TodoHack) scanValues(columns []string) ([]any, error) {
+func (*TodoHistory) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case todohack.FieldOperation, todohack.FieldName:
+		case todohistory.FieldOperation, todohistory.FieldName:
 			values[i] = new(sql.NullString)
-		case todohack.FieldHistoryTime:
+		case todohistory.FieldHistoryTime:
 			values[i] = new(sql.NullTime)
-		case todohack.FieldID, todohack.FieldRef, todohack.FieldOtherID:
+		case todohistory.FieldID, todohistory.FieldRef, todohistory.FieldOtherID:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -51,44 +51,44 @@ func (*TodoHack) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the TodoHack fields.
-func (th *TodoHack) assignValues(columns []string, values []any) error {
+// to the TodoHistory fields.
+func (th *TodoHistory) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case todohack.FieldID:
+		case todohistory.FieldID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				th.ID = *value
 			}
-		case todohack.FieldHistoryTime:
+		case todohistory.FieldHistoryTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field history_time", values[i])
 			} else if value.Valid {
 				th.HistoryTime = value.Time
 			}
-		case todohack.FieldRef:
+		case todohistory.FieldOperation:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field operation", values[i])
+			} else if value.Valid {
+				th.Operation = enthistory.OpType(value.String)
+			}
+		case todohistory.FieldRef:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field ref", values[i])
 			} else if value != nil {
 				th.Ref = *value
 			}
-		case todohack.FieldOperation:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field operation", values[i])
-			} else if value.Valid {
-				th.Operation = optype.OpType(value.String)
-			}
-		case todohack.FieldOtherID:
+		case todohistory.FieldOtherID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field other_id", values[i])
 			} else if value != nil {
 				th.OtherID = *value
 			}
-		case todohack.FieldName:
+		case todohistory.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
@@ -101,43 +101,43 @@ func (th *TodoHack) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the TodoHack.
+// Value returns the ent.Value that was dynamically selected and assigned to the TodoHistory.
 // This includes values selected through modifiers, order, etc.
-func (th *TodoHack) Value(name string) (ent.Value, error) {
+func (th *TodoHistory) Value(name string) (ent.Value, error) {
 	return th.selectValues.Get(name)
 }
 
-// Update returns a builder for updating this TodoHack.
-// Note that you need to call TodoHack.Unwrap() before calling this method if this TodoHack
+// Update returns a builder for updating this TodoHistory.
+// Note that you need to call TodoHistory.Unwrap() before calling this method if this TodoHistory
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (th *TodoHack) Update() *TodoHackUpdateOne {
-	return NewTodoHackClient(th.config).UpdateOne(th)
+func (th *TodoHistory) Update() *TodoHistoryUpdateOne {
+	return NewTodoHistoryClient(th.config).UpdateOne(th)
 }
 
-// Unwrap unwraps the TodoHack entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the TodoHistory entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (th *TodoHack) Unwrap() *TodoHack {
+func (th *TodoHistory) Unwrap() *TodoHistory {
 	_tx, ok := th.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: TodoHack is not a transactional entity")
+		panic("ent: TodoHistory is not a transactional entity")
 	}
 	th.config.driver = _tx.drv
 	return th
 }
 
 // String implements the fmt.Stringer.
-func (th *TodoHack) String() string {
+func (th *TodoHistory) String() string {
 	var builder strings.Builder
-	builder.WriteString("TodoHack(")
+	builder.WriteString("TodoHistory(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", th.ID))
 	builder.WriteString("history_time=")
 	builder.WriteString(th.HistoryTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("ref=")
-	builder.WriteString(fmt.Sprintf("%v", th.Ref))
-	builder.WriteString(", ")
 	builder.WriteString("operation=")
 	builder.WriteString(fmt.Sprintf("%v", th.Operation))
+	builder.WriteString(", ")
+	builder.WriteString("ref=")
+	builder.WriteString(fmt.Sprintf("%v", th.Ref))
 	builder.WriteString(", ")
 	builder.WriteString("other_id=")
 	builder.WriteString(fmt.Sprintf("%v", th.OtherID))
@@ -148,5 +148,5 @@ func (th *TodoHack) String() string {
 	return builder.String()
 }
 
-// TodoHacks is a parsable slice of TodoHack.
-type TodoHacks []*TodoHack
+// TodoHistories is a parsable slice of TodoHistory.
+type TodoHistories []*TodoHistory

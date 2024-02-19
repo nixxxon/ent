@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/nixxxon/entdemo/ent/schema"
 	"github.com/nixxxon/entdemo/ent/todo"
-	"github.com/nixxxon/entdemo/ent/todohack"
+	"github.com/nixxxon/entdemo/ent/todohistory"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -25,18 +25,18 @@ func init() {
 	todoDescID := todoFields[0].Descriptor()
 	// todo.DefaultID holds the default value on creation for the id field.
 	todo.DefaultID = todoDescID.Default.(func() uuid.UUID)
-	todohackFields := schema.TodoHack{}.Fields()
-	_ = todohackFields
-	// todohackDescHistoryTime is the schema descriptor for history_time field.
-	todohackDescHistoryTime := todohackFields[0].Descriptor()
-	// todohack.DefaultHistoryTime holds the default value on creation for the history_time field.
-	todohack.DefaultHistoryTime = todohackDescHistoryTime.Default.(func() time.Time)
-	// todohackDescName is the schema descriptor for name field.
-	todohackDescName := todohackFields[5].Descriptor()
-	// todohack.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	todohack.NameValidator = todohackDescName.Validators[0].(func(string) error)
-	// todohackDescID is the schema descriptor for id field.
-	todohackDescID := todohackFields[3].Descriptor()
-	// todohack.DefaultID holds the default value on creation for the id field.
-	todohack.DefaultID = todohackDescID.Default.(func() uuid.UUID)
+	todohistoryFields := schema.TodoHistory{}.Fields()
+	_ = todohistoryFields
+	// todohistoryDescHistoryTime is the schema descriptor for history_time field.
+	todohistoryDescHistoryTime := todohistoryFields[0].Descriptor()
+	// todohistory.DefaultHistoryTime holds the default value on creation for the history_time field.
+	todohistory.DefaultHistoryTime = todohistoryDescHistoryTime.Default.(func() time.Time)
+	// todohistoryDescName is the schema descriptor for name field.
+	todohistoryDescName := todohistoryFields[5].Descriptor()
+	// todohistory.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	todohistory.NameValidator = todohistoryDescName.Validators[0].(func(string) error)
+	// todohistoryDescID is the schema descriptor for id field.
+	todohistoryDescID := todohistoryFields[3].Descriptor()
+	// todohistory.DefaultID holds the default value on creation for the id field.
+	todohistory.DefaultID = todohistoryDescID.Default.(func() uuid.UUID)
 }

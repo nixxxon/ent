@@ -135,28 +135,28 @@ func (f TodoMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) 
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.TodoMutation", m)
 }
 
-// The TodoHackQueryRuleFunc type is an adapter to allow the use of ordinary
+// The TodoHistoryQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
-type TodoHackQueryRuleFunc func(context.Context, *ent.TodoHackQuery) error
+type TodoHistoryQueryRuleFunc func(context.Context, *ent.TodoHistoryQuery) error
 
 // EvalQuery return f(ctx, q).
-func (f TodoHackQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.TodoHackQuery); ok {
+func (f TodoHistoryQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TodoHistoryQuery); ok {
 		return f(ctx, q)
 	}
-	return Denyf("ent/privacy: unexpected query type %T, expect *ent.TodoHackQuery", q)
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.TodoHistoryQuery", q)
 }
 
-// The TodoHackMutationRuleFunc type is an adapter to allow the use of ordinary
+// The TodoHistoryMutationRuleFunc type is an adapter to allow the use of ordinary
 // functions as a mutation rule.
-type TodoHackMutationRuleFunc func(context.Context, *ent.TodoHackMutation) error
+type TodoHistoryMutationRuleFunc func(context.Context, *ent.TodoHistoryMutation) error
 
 // EvalMutation calls f(ctx, m).
-func (f TodoHackMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
-	if m, ok := m.(*ent.TodoHackMutation); ok {
+func (f TodoHistoryMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.TodoHistoryMutation); ok {
 		return f(ctx, m)
 	}
-	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.TodoHackMutation", m)
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.TodoHistoryMutation", m)
 }
 
 type (
@@ -196,7 +196,7 @@ func queryFilter(q ent.Query) (Filter, error) {
 	switch q := q.(type) {
 	case *ent.TodoQuery:
 		return q.Filter(), nil
-	case *ent.TodoHackQuery:
+	case *ent.TodoHistoryQuery:
 		return q.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected query type %T for query filter", q)
@@ -207,7 +207,7 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	switch m := m.(type) {
 	case *ent.TodoMutation:
 		return m.Filter(), nil
-	case *ent.TodoHackMutation:
+	case *ent.TodoHistoryMutation:
 		return m.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected mutation type %T for mutation filter", m)
