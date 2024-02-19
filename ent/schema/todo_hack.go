@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/nixxxon/entdemo/ent/schema/optype"
 
 	"github.com/flume/enthistory"
 )
@@ -48,7 +47,7 @@ func (TodoHack) Fields() []ent.Field {
 				},
 			),
 		field.Enum("operation").
-			GoType(optype.OpType("")).
+			GoType(enthistory.OpType("")).
 			Immutable(),
 	}
 
